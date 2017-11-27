@@ -27,25 +27,23 @@ public class SpringEncryption {
 	public void run() {
 		String data = "Account Name:";
 		String password = "123456";
-		byte[] salt = generateSalt();
-		int noIterations = 1500;
+		int noIterations = 185000;
+		int hashWidth = 256;
 		// SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA1,
 		// SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256,
 		// SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA512
-		Pbkdf2PasswordEncoder encoder = new Pbkdf2PasswordEncoder();
-		encoder.setAlgorithm(SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA512);
-		String result = encoder.encode(password);
-		System.out.println("encryptedData> " + result + " \nMatch?>" + encoder.matches(password, result));
+
+		Pbkdf2PasswordEncoder encoder = new Pbkdf2PasswordEncoder(password, noIterations, hashWidth);
+		encoder.setAlgorithm(SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
+		String encryptedData = encoder.encode(data);
+
+		Pbkdf2PasswordEncoder decoder = new Pbkdf2PasswordEncoder(password, noIterations, hashWidth);
+		decoder.setAlgorithm(SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
+		System.out.println("encryptedData> " + encryptedData + " \nMatch?>" + decoder.matches(data, encryptedData));
+
 		// byte[] encryptedData = encrypt(data.getBytes(), password.toCharArray(), salt,
 		// noIterations);
 		// System.out.println("encryptedData> " + encryptedData);
-	}
-
-	public byte[] generateSalt() {
-		Random r = new SecureRandom();
-		byte[] salt = new byte[20];
-		r.nextBytes(salt);
-		return salt;
 	}
 
 	public boolean encrypt() {
