@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.spec.*;
 import java.util.Base64;
@@ -19,14 +21,50 @@ public class AsymmetricEncryption {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 		AsymmetricEncryption app = new AsymmetricEncryption();
-		app.generateKeyPairs();
+		try {
+			app.createNewKeyStore();
+			KeyPair kp = app.generateKeyPair(2048);
+			
+			app.storeToKeyStore(ks, password, kp.getPublic(), keyStoreFileName);
+		} catch (KeyStoreException | CertificateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void storeToKeyStore(KeyStore ks, char[] passwordForKeyCharArray, Key key, String filePathToStore)
+			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+		Certificate[] cert = ks.getCertificateChain("keyAlias");
+		ks.setKeyEntry("keyAlias", key, passwordForKeyCharArray, cert);
+		OutputStream writeStream = new FileOutputStream(filePathToStore);
+		ks.store(writeStream, passwordForKeyCharArray);
+		writeStream.close();
+	}
+
+	static KeyStore ks;
+	static char[] password = "123456".toCharArray();
+	static String keyStoreFileName = "NewKeyStore.jks";
+
+	public void createNewKeyStore()
+			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+		ks = KeyStore.getInstance("JKS");
+
+		// store away the keystore
+		java.io.FileOutputStream fos = new java.io.FileOutputStream(keyStoreFileName);
+		ks.load(null, password);
+		ks.store(fos, password);
+		fos.close();
 	}
 
 	public void openKeyStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 		// get user password and file input stream
 		char[] password = "".toCharArray();
-		FileInputStream fis = new FileInputStream("keyStoreName");
+		FileInputStream fis = new FileInputStream(keyStoreFileName);
 		ks.load(fis, password);
 		fis.close();
 
@@ -42,9 +80,10 @@ public class AsymmetricEncryption {
 		// ks.setEntry("secretKeyAlias", skEntry, password);
 
 		// store away the keystore
-		java.io.FileOutputStream fos = new java.io.FileOutputStream("newKeyStoreName");
-		ks.store(fos, password);
-		fos.close();
+		// java.io.FileOutputStream fos = new
+		// java.io.FileOutputStream(keyStoreFileName);
+		// ks.store(fos, password);
+		// fos.close();
 
 	}
 
@@ -84,7 +123,8 @@ public class AsymmetricEncryption {
 
 		return Base64.getEncoder().encodeToString(signature);
 	}
-//http://niels.nu/blog/2016/java-rsa.html
+
+	// http://niels.nu/blog/2016/java-rsa.html
 	public void test() throws Exception {
 		KeyPair pair = generateKeyPair(2048);
 
@@ -104,22 +144,24 @@ public class AsymmetricEncryption {
 
 		return publicSignature.verify(signatureBytes);
 	}
+
 	public static KeyPair getKeyPairFromKeyStore() throws Exception {
-	    InputStream ins = AsymmetricEncryption.class.getResourceAsStream("/keystore.jks");
+		InputStream ins = AsymmetricEncryption.class.getResourceAsStream("/keystore.jks");
 
-	    KeyStore keyStore = KeyStore.getInstance("JCEKS");
-	    keyStore.load(ins, "s3cr3t".toCharArray());   //Keystore password
-	    KeyStore.PasswordProtection keyPassword =       //Key password
-	            new KeyStore.PasswordProtection("s3cr3t".toCharArray());
+		KeyStore keyStore = KeyStore.getInstance("JCEKS");
+		keyStore.load(ins, "s3cr3t".toCharArray()); // Keystore password
+		KeyStore.PasswordProtection keyPassword = // Key password
+				new KeyStore.PasswordProtection("s3cr3t".toCharArray());
 
-	    KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("mykey", keyPassword);
+		KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("mykey", keyPassword);
 
-	    java.security.cert.Certificate cert = keyStore.getCertificate("mykey");
-	    PublicKey publicKey = cert.getPublicKey();
-	    PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+		java.security.cert.Certificate cert = keyStore.getCertificate("mykey");
+		PublicKey publicKey = cert.getPublicKey();
+		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
 
-	    return new KeyPair(publicKey, privateKey);
+		return new KeyPair(publicKey, privateKey);
 	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void generateKeyPairs() throws NoSuchAlgorithmException {
 
