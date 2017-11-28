@@ -21,6 +21,7 @@ public class AsymmetricEncryption {
 	public static void main(String[] args) {
 		AsymmetricEncryption app = new AsymmetricEncryption();
 		app.run();
+		System.out.println("AsymmetricEncryption Done");
 	}
 
 	KeyPair kp;
@@ -28,7 +29,7 @@ public class AsymmetricEncryption {
 	PrivateKey privateKey;
 
 	private void run() {
-		System.out.println("Asys");
+		System.out.println("AsymmetricEncryption");
 		kp = generateKeyPair(2048);
 		publicKey = kp.getPublic();
 		privateKey = kp.getPrivate();
