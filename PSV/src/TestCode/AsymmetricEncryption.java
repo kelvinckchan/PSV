@@ -2,29 +2,23 @@ package TestCode;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.spec.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 
 public class AsymmetricEncryption {
 
-	public static void main(String[] args) throws NoSuchAlgorithmException {
+	public static void main(String[] args) {
 		AsymmetricEncryption app = new AsymmetricEncryption();
 		app.run();
 	}
@@ -34,21 +28,23 @@ public class AsymmetricEncryption {
 	PrivateKey privateKey;
 
 	private void run() {
-		try {
-			kp = generateKeyPair(2048);
-			publicKey = kp.getPublic();
-			privateKey = kp.getPrivate();
-			saveKeyPair(kp);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		System.out.println("Asys");
+		kp = generateKeyPair(2048);
+		publicKey = kp.getPublic();
+		privateKey = kp.getPrivate();
+		saveKeyPair(kp);
 	}
 
-	public KeyPair generateKeyPair(int keySize) throws Exception {
-		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-		generator.initialize(keySize, new SecureRandom());
-		KeyPair pair = generator.generateKeyPair();
-		return pair;
+	public KeyPair generateKeyPair(int keySize) {
+		try {
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+			kpg.initialize(2048);
+			KeyPair kp = kpg.genKeyPair();
+			return kp;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static String encrypt(String plainText, PublicKey publicKey) throws Exception {
@@ -165,5 +161,4 @@ public class AsymmetricEncryption {
 		cipher.init(Cipher.DECRYPT_MODE, priKey);
 		return cipher.doFinal(data);
 	}
-
 }
