@@ -88,7 +88,7 @@ public class PBEncryption {
 	public byte[] encrypt2(byte[] data, char[] password, byte[] salt, int noIterations, int keyLength) {
 		try {
 			/* Derive the key, given password and salt. */
-			String method = "PBKDF2WithHmacSHA256";
+			String method = "PBKDF2WithHmacSHA256"; 
 			SecretKeyFactory factory = SecretKeyFactory.getInstance(method);
 			PBEKeySpec spec = new PBEKeySpec(password, salt, noIterations, keyLength );
 			SecretKey tmp = factory.generateSecret(spec);

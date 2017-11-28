@@ -1,16 +1,5 @@
 package TestCode;
 
-import java.security.AlgorithmParameters;
-import java.security.SecureRandom;
-import java.util.Random;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm;
@@ -40,7 +29,7 @@ public class SpringEncryption {
 		Pbkdf2PasswordEncoder decoder = new Pbkdf2PasswordEncoder(password, noIterations, hashWidth);
 		decoder.setAlgorithm(SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
 		System.out.println("encryptedData> " + encryptedData + " \nMatch?>" + decoder.matches(data, encryptedData));
-
+		
 		// byte[] encryptedData = encrypt(data.getBytes(), password.toCharArray(), salt,
 		// noIterations);
 		// System.out.println("encryptedData> " + encryptedData);

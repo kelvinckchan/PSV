@@ -36,8 +36,6 @@ public class ViewController {
 	private Label postalCodeLabel;
 	@FXML
 	private Label cityLabel;
-	@FXML
-	private Label birthdayLabel;
 
 	// Reference to the main application.
 	private Main mainApp;
@@ -105,7 +103,6 @@ public class ViewController {
 			streetLabel.setText("");
 			postalCodeLabel.setText("");
 			cityLabel.setText("");
-			birthdayLabel.setText("");
 		}
 	}
 

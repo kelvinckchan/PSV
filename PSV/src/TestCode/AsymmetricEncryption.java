@@ -5,10 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.CertificateException;
 import java.security.spec.*;
+import java.util.Base64;
+
+import javax.crypto.Cipher;
 
 public class AsymmetricEncryption {
 
@@ -17,6 +22,105 @@ public class AsymmetricEncryption {
 		app.generateKeyPairs();
 	}
 
+	public void openKeyStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+		KeyStore ks = KeyStore.getInstance("JKS");
+		// get user password and file input stream
+		char[] password = "".toCharArray();
+		FileInputStream fis = new FileInputStream("keyStoreName");
+		ks.load(fis, password);
+		fis.close();
+
+		// // get my private key
+		// KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
+		// ks.getEntry("privateKeyAlias", password);
+		// PrivateKey myPrivateKey = pkEntry.getPrivateKey();
+		//
+		// // save my secret key
+		// javax.crypto.SecretKey mySecretKey;
+		// KeyStore.SecretKeyEntry skEntry =
+		// new KeyStore.SecretKeyEntry(mySecretKey);
+		// ks.setEntry("secretKeyAlias", skEntry, password);
+
+		// store away the keystore
+		java.io.FileOutputStream fos = new java.io.FileOutputStream("newKeyStoreName");
+		ks.store(fos, password);
+		fos.close();
+
+	}
+
+	public static KeyPair generateKeyPair(int keySize) throws Exception {
+		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+		// generator.initialize(2048, new SecureRandom());
+		generator.initialize(keySize, new SecureRandom());
+		KeyPair pair = generator.generateKeyPair();
+		pair.getPrivate();
+		return pair;
+	}
+
+	public static String encrypt(String plainText, PublicKey publicKey) throws Exception {
+		Cipher encryptCipher = Cipher.getInstance("RSA");
+		encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+		byte[] cipherText = encryptCipher.doFinal(plainText.getBytes("UTF-8"));
+
+		return Base64.getEncoder().encodeToString(cipherText);
+	}
+
+	public static String decrypt(String cipherText, PrivateKey privateKey) throws Exception {
+		byte[] bytes = Base64.getDecoder().decode(cipherText);
+
+		Cipher decriptCipher = Cipher.getInstance("RSA");
+		decriptCipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+		return new String(decriptCipher.doFinal(bytes), "UTF-8");
+	}
+
+	public static String sign(String plainText, PrivateKey privateKey) throws Exception {
+		Signature privateSignature = Signature.getInstance("SHA256withRSA");
+		privateSignature.initSign(privateKey);
+		privateSignature.update(plainText.getBytes("UTF-8"));
+
+		byte[] signature = privateSignature.sign();
+
+		return Base64.getEncoder().encodeToString(signature);
+	}
+//http://niels.nu/blog/2016/java-rsa.html
+	public void test() throws Exception {
+		KeyPair pair = generateKeyPair(2048);
+
+		String signature = sign("foobar", pair.getPrivate());
+
+		// Let's check the signature
+		boolean isCorrect = verify("foobar", signature, pair.getPublic());
+		System.out.println("Signature correct: " + isCorrect);
+	}
+
+	public static boolean verify(String plainText, String signature, PublicKey publicKey) throws Exception {
+		Signature publicSignature = Signature.getInstance("SHA256withRSA");
+		publicSignature.initVerify(publicKey);
+		publicSignature.update(plainText.getBytes("UTF-8"));
+
+		byte[] signatureBytes = Base64.getDecoder().decode(signature);
+
+		return publicSignature.verify(signatureBytes);
+	}
+	public static KeyPair getKeyPairFromKeyStore() throws Exception {
+	    InputStream ins = AsymmetricEncryption.class.getResourceAsStream("/keystore.jks");
+
+	    KeyStore keyStore = KeyStore.getInstance("JCEKS");
+	    keyStore.load(ins, "s3cr3t".toCharArray());   //Keystore password
+	    KeyStore.PasswordProtection keyPassword =       //Key password
+	            new KeyStore.PasswordProtection("s3cr3t".toCharArray());
+
+	    KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("mykey", keyPassword);
+
+	    java.security.cert.Certificate cert = keyStore.getCertificate("mykey");
+	    PublicKey publicKey = cert.getPublicKey();
+	    PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+
+	    return new KeyPair(publicKey, privateKey);
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void generateKeyPairs() throws NoSuchAlgorithmException {
 
 		KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
