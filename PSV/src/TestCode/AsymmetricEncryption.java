@@ -1,11 +1,13 @@
 package TestCode;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -15,93 +17,44 @@ import java.security.cert.CertificateException;
 import java.security.spec.*;
 import java.util.Base64;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class AsymmetricEncryption {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 		AsymmetricEncryption app = new AsymmetricEncryption();
+		app.run();
+	}
+
+	KeyPair kp;
+	PublicKey publicKey;
+	PrivateKey privateKey;
+
+	private void run() {
 		try {
-			app.createNewKeyStore();
-			KeyPair kp = app.generateKeyPair(2048);
-			
-			app.storeToKeyStore(ks, password, kp.getPublic(), keyStoreFileName);
-		} catch (KeyStoreException | CertificateException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			kp = generateKeyPair(2048);
+			publicKey = kp.getPublic();
+			privateKey = kp.getPrivate();
+			saveKeyPair(kp);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
-	public void storeToKeyStore(KeyStore ks, char[] passwordForKeyCharArray, Key key, String filePathToStore)
-			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-		Certificate[] cert = ks.getCertificateChain("keyAlias");
-		ks.setKeyEntry("keyAlias", key, passwordForKeyCharArray, cert);
-		OutputStream writeStream = new FileOutputStream(filePathToStore);
-		ks.store(writeStream, passwordForKeyCharArray);
-		writeStream.close();
-	}
-
-	static KeyStore ks;
-	static char[] password = "123456".toCharArray();
-	static String keyStoreFileName = "NewKeyStore.jks";
-
-	public void createNewKeyStore()
-			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-		ks = KeyStore.getInstance("JKS");
-
-		// store away the keystore
-		java.io.FileOutputStream fos = new java.io.FileOutputStream(keyStoreFileName);
-		ks.load(null, password);
-		ks.store(fos, password);
-		fos.close();
-	}
-
-	public void openKeyStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-		KeyStore ks = KeyStore.getInstance("JKS");
-		// get user password and file input stream
-		char[] password = "".toCharArray();
-		FileInputStream fis = new FileInputStream(keyStoreFileName);
-		ks.load(fis, password);
-		fis.close();
-
-		// // get my private key
-		// KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-		// ks.getEntry("privateKeyAlias", password);
-		// PrivateKey myPrivateKey = pkEntry.getPrivateKey();
-		//
-		// // save my secret key
-		// javax.crypto.SecretKey mySecretKey;
-		// KeyStore.SecretKeyEntry skEntry =
-		// new KeyStore.SecretKeyEntry(mySecretKey);
-		// ks.setEntry("secretKeyAlias", skEntry, password);
-
-		// store away the keystore
-		// java.io.FileOutputStream fos = new
-		// java.io.FileOutputStream(keyStoreFileName);
-		// ks.store(fos, password);
-		// fos.close();
-
-	}
-
-	public static KeyPair generateKeyPair(int keySize) throws Exception {
+	public KeyPair generateKeyPair(int keySize) throws Exception {
 		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-		// generator.initialize(2048, new SecureRandom());
 		generator.initialize(keySize, new SecureRandom());
 		KeyPair pair = generator.generateKeyPair();
-		pair.getPrivate();
 		return pair;
 	}
 
 	public static String encrypt(String plainText, PublicKey publicKey) throws Exception {
 		Cipher encryptCipher = Cipher.getInstance("RSA");
 		encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
 		byte[] cipherText = encryptCipher.doFinal(plainText.getBytes("UTF-8"));
-
 		return Base64.getEncoder().encodeToString(cipherText);
 	}
 
@@ -124,17 +77,6 @@ public class AsymmetricEncryption {
 		return Base64.getEncoder().encodeToString(signature);
 	}
 
-	// http://niels.nu/blog/2016/java-rsa.html
-	public void test() throws Exception {
-		KeyPair pair = generateKeyPair(2048);
-
-		String signature = sign("foobar", pair.getPrivate());
-
-		// Let's check the signature
-		boolean isCorrect = verify("foobar", signature, pair.getPublic());
-		System.out.println("Signature correct: " + isCorrect);
-	}
-
 	public static boolean verify(String plainText, String signature, PublicKey publicKey) throws Exception {
 		Signature publicSignature = Signature.getInstance("SHA256withRSA");
 		publicSignature.initVerify(publicKey);
@@ -145,49 +87,30 @@ public class AsymmetricEncryption {
 		return publicSignature.verify(signatureBytes);
 	}
 
-	public static KeyPair getKeyPairFromKeyStore() throws Exception {
-		InputStream ins = AsymmetricEncryption.class.getResourceAsStream("/keystore.jks");
-
-		KeyStore keyStore = KeyStore.getInstance("JCEKS");
-		keyStore.load(ins, "s3cr3t".toCharArray()); // Keystore password
-		KeyStore.PasswordProtection keyPassword = // Key password
-				new KeyStore.PasswordProtection("s3cr3t".toCharArray());
-
-		KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("mykey", keyPassword);
-
-		java.security.cert.Certificate cert = keyStore.getCertificate("mykey");
-		PublicKey publicKey = cert.getPublicKey();
-		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
-
-		return new KeyPair(publicKey, privateKey);
+	// http://niels.nu/blog/2016/java-rsa.html
+	public void test() throws Exception {
+		KeyPair pair = generateKeyPair(2048);
+		String signature = sign("foobar", pair.getPrivate());
+		// Let's check the signature
+		boolean isCorrect = verify("foobar", signature, pair.getPublic());
+		System.out.println("Signature correct: " + isCorrect);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void generateKeyPairs() throws NoSuchAlgorithmException {
-
-		KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-		kpg.initialize(4096);
-		KeyPair kp = kpg.genKeyPair();
-		Key publicKey = kp.getPublic();
-		Key privateKey = kp.getPrivate();
-		KeyFactory fact = KeyFactory.getInstance("RSA");
-		RSAPublicKeySpec pub = null;
-		RSAPrivateKeySpec priv = null;
+	public void saveKeyPair(KeyPair kp) {
 		try {
-			pub = fact.getKeySpec(kp.getPublic(), RSAPublicKeySpec.class);
-			priv = fact.getKeySpec(kp.getPrivate(), RSAPrivateKeySpec.class);
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
-		}
-
-		try {
+			KeyFactory fact = KeyFactory.getInstance("RSA");
+			RSAPublicKeySpec pub = fact.getKeySpec(kp.getPublic(), RSAPublicKeySpec.class);
+			RSAPrivateKeySpec priv = fact.getKeySpec(kp.getPrivate(), RSAPrivateKeySpec.class);
 			saveToFile("public.key", pub.getModulus(), pub.getPublicExponent());
 			saveToFile("private.key", priv.getModulus(), priv.getPrivateExponent());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
 		}
-
 	}
 
 	public void saveToFile(String fileName, BigInteger mod, BigInteger exp) throws IOException {
@@ -202,31 +125,45 @@ public class AsymmetricEncryption {
 		}
 	}
 
-	public void readFromFile(String fileName) {
-		FileInputStream keyfis;
-		try {
-			keyfis = new FileInputStream(fileName);
-			byte[] encKey = new byte[keyfis.available()];
-			keyfis.read(encKey);
-			X509EncodedKeySpec spec = new X509EncodedKeySpec(encKey);
-			KeyFactory kf = KeyFactory.getInstance("RSA");
-			// new BigInteger (1, b64dec.decodeBuffer(modulusBase64)), new BigInteger(1,
-			// b64dec.decodeBuffer(exponentBase64)));
-			// keyfis.close();
-			// KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-			// RSAPublicKeySpec pubKeySpec = keyFactory.getKeySpec(encKey,
-			// RSAPublicKeySpec.class);
-			// PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	// RSAPrivateKeySpec rsaPublickeySpec;
+	// RSAPublicKeySpec rsaPrivatekeySpec;
 
+	public Key readKeyFromFile(String keyFileName, String Type) throws IOException {
+		InputStream in = this.getClass().getResourceAsStream(keyFileName);
+		ObjectInputStream oin = new ObjectInputStream(new BufferedInputStream(in));
+		try {
+			BigInteger m = (BigInteger) oin.readObject();
+			BigInteger e = (BigInteger) oin.readObject();
+			KeyFactory keyFact = KeyFactory.getInstance("RSA");
+			if (Type.equals("Private")) {
+				return keyFact.generatePrivate(new RSAPrivateKeySpec(m, e));
+			} else if (Type.equals("Public")) {
+				return keyFact.generatePublic(new RSAPublicKeySpec(m, e));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Spurious serialisation error", e);
+		} finally {
+			oin.close();
+		}
+		return null;
+	}
+
+	public byte[] rsaEncrypt(byte[] data)
+			throws IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, NoSuchAlgorithmException,
+			IOException, NoSuchPaddingException, InvalidKeyException {
+		PublicKey pubKey = (PublicKey) readKeyFromFile("/public.key", "Public");
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+		return cipher.doFinal(data);
+	}
+
+	public byte[] rsaDecrypt(byte[] data)
+			throws IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, NoSuchAlgorithmException,
+			IOException, NoSuchPaddingException, InvalidKeyException {
+		PrivateKey priKey = (PrivateKey) readKeyFromFile("/private.key", "Private");
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, priKey);
+		return cipher.doFinal(data);
 	}
 
 }
