@@ -1,22 +1,19 @@
 package TestCode;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.AlgorithmParameters;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.util.Objects;
+import java.util.Arrays;
 import java.util.Random;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -34,34 +31,77 @@ public class PBEncryption {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void run() throws UnsupportedEncodingException {
 		String data = "This is the secret data need to Encrypt";
 		String password = "123456";
-		byte[] salt = generateSalt();
+		byte[] salt3DES = generateSalt(8);
+		byte[] saltSHA256 = generateSalt(128);
 		int noIterations = 65536;
 		int keyLength = 256;
 
 		System.out.println("rawData> " + data);
-		byte[] encryptedData = encryptPBEWithMD5AndTripleDES(data.getBytes(), password.toCharArray(), salt, noIterations);
-		System.out.println("encryptPBEWithMD5AndTripleDES> " + encryptedData);
+		byte[] encryptPBEWithMD5AndTripleDESData = encryptPBEWithMD5AndTripleDES(data.getBytes(),
+				password.toCharArray(), salt3DES, noIterations);
+		System.out.println("encryptPBEWithMD5AndTripleDES> " + encryptPBEWithMD5AndTripleDESData);
 
-		encryptedData = encryptPBKDF2WithHmacSHA256(data.getBytes(), password.toCharArray(), salt, noIterations,
-				keyLength);
-		System.out.println("encryptPBKDF2WithHmacSHA256> " + encryptedData);
+		FileUtil.exportFileAsByteArray(new File("./encryptPBEWithMD5AndTripleDESData.xml").getAbsolutePath(), encryptPBEWithMD5AndTripleDESData);
+		byte[] in = FileUtil.importFileAsByteArray("./encryptPBEWithMD5AndTripleDESData.xml");
+		
+		byte[] decryptedData0 = decryptPBEWithMD5AndTripleDES(in, password.toCharArray(),
+				noIterations);
+		System.out.println("decryptPBKDF2WithHmacSHA256> " + new String(decryptedData0));
 
-		byte[] decryptedData = decryptPBKDF2WithHmacSHA256(encryptedData, iv);
-		System.out.println("decryptPBKDF2WithHmacSHA256> " + new String(decryptedData));
+		System.out.println("salt3DES: " + salt3DES + " Size> " + salt3DES.length);
+//
+//		byte[] encryptPBKDF2WithHmacSHA256Data = encryptPBKDF2WithHmacSHA256(data.getBytes(), password.toCharArray(),
+//				saltSHA256, noIterations, keyLength);
+//		System.out.println("encryptPBKDF2WithHmacSHA256> " + encryptPBKDF2WithHmacSHA256Data);
+//
+//		byte[] decryptedData1 = decryptPBKDF2WithHmacSHA256(encryptPBKDF2WithHmacSHA256Data, password.toCharArray(),
+//				noIterations, keyLength);
+//
+//		System.out.println("decryptPBKDF2WithHmacSHA256> " + new String(decryptedData1));
+//		System.out.println("saltSHA256: " + saltSHA256 + " Size> " + saltSHA256.length);
+		// System.out.println("iv: " + iv + " Size> " + iv.length);
+
 	}
 
-	public byte[] generateSalt() {
+	public byte[] generateSalt(int saltSize) {
 		Random r = new SecureRandom();
-		byte[] salt = new byte[20];
+		byte[] salt = new byte[saltSize];
 		r.nextBytes(salt);
 		return salt;
 	}
+
+	public byte[] concateByte(byte[]... b) {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		for (byte[] byt : b)
+			try {
+				outputStream.write(byt);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		return outputStream.toByteArray();
+	}
+
+	// public byte[] encrypt(byte[] data, char[] password, byte[] salt, int
+	// noIterations) {
+	// try {
+	// String method = "PBEWithMD5AndTripleDES";
+	// SecretKeyFactory kf = SecretKeyFactory.getInstance(method);
+	// PBEKeySpec keySpec = new PBEKeySpec(password);
+	// SecretKey key = kf.generateSecret(keySpec);
+	// Cipher cipher = Cipher.getInstance(method);
+	// PBEParameterSpec params = new PBEParameterSpec(salt, noIterations);
+	//
+	// byte[] cipherText = cipher.doFinal(data);
+	// return concateByte(salt, cipherText);
+	// } catch (Exception e) {
+	// throw new RuntimeException("Spurious encryption error");
+	// }
+	// }
 
 	public byte[] encryptPBEWithMD5AndTripleDES(byte[] data, char[] password, byte[] salt, int noIterations) {
 		try {
@@ -69,18 +109,37 @@ public class PBEncryption {
 			SecretKeyFactory kf = SecretKeyFactory.getInstance(method);
 			PBEKeySpec keySpec = new PBEKeySpec(password);
 			SecretKey key = kf.generateSecret(keySpec);
-			Cipher ciph = Cipher.getInstance(method);
-			ciph.init(Cipher.ENCRYPT_MODE, key);
+			Cipher cipher = Cipher.getInstance(method);
 			PBEParameterSpec params = new PBEParameterSpec(salt, noIterations);
-			return ciph.doFinal(data);
+			cipher.init(Cipher.ENCRYPT_MODE, key, params);
+			byte[] cipherText = cipher.doFinal(data);
+
+			return concateByte(salt, cipherText);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public byte[] decryptPBEWithMD5AndTripleDES(byte[] data, char[] password, int noIterations) {
+		try {
+			byte[] salt = Arrays.copyOfRange(data, 0, 8);
+			byte[] ciphertext = Arrays.copyOfRange(data, 8, data.length);
+
+			String method = "PBEWithMD5AndTripleDES";
+			SecretKeyFactory kf = SecretKeyFactory.getInstance(method);
+			PBEKeySpec keySpec = new PBEKeySpec(password);
+			SecretKey key = kf.generateSecret(keySpec);
+			Cipher ciph = Cipher.getInstance(method);
+			PBEParameterSpec params = new PBEParameterSpec(salt, noIterations);
+			ciph.init(Cipher.DECRYPT_MODE, key, params);
+
+			return ciph.doFinal(ciphertext);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Spurious encryption error");
 		}
 	}
-
-	SecretKey secretkey;
-	byte[] iv;
 
 	public byte[] encryptPBKDF2WithHmacSHA256(byte[] data, char[] password, byte[] salt, int noIterations,
 			int keyLength) {
@@ -89,44 +148,33 @@ public class PBEncryption {
 			String method = "PBKDF2WithHmacSHA256";
 			SecretKeyFactory factory = SecretKeyFactory.getInstance(method);
 			PBEKeySpec spec = new PBEKeySpec(password, salt, noIterations, keyLength);
-			SecretKey tmp = factory.generateSecret(spec);
-			secretkey = new SecretKeySpec(tmp.getEncoded(), "AES");
+			SecretKey secretkey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
 			/* Encrypt the message. */
-			cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, secretkey);
 			AlgorithmParameters params = cipher.getParameters();
-			iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-			byte[] ciphertext = cipher.doFinal(data);
+			byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+			byte[] cipherText = cipher.doFinal(data);
 
-			return ciphertext;
+			return concateByte(salt, iv, cipherText);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Spurious encryption error");
 		}
 	}
 
-	Cipher cipher;
-
-	public boolean match2(byte[] rawData, byte[] encryptedData, Cipher cipher, SecretKey secretkey) {
+	public byte[] decryptPBKDF2WithHmacSHA256(byte[] data, char[] password, int noIterations, int keyLength) {
 		try {
+			byte[] salt = Arrays.copyOfRange(data, 0, 128);
+			byte[] iv = Arrays.copyOfRange(data, 128, 128 + 16);
+			byte[] ciphertext = Arrays.copyOfRange(data, 128 + 16, data.length);
 
-			/* Encrypt the message. */
-			cipher.init(Cipher.ENCRYPT_MODE, secretkey);
-			byte[] ciphertext = cipher.doFinal(rawData);
-			System.out.printf("rawData>%s, encryptedData>%s, ciphertext>%s\n", new String(rawData), encryptedData,
-					ciphertext);
+			String method = "PBKDF2WithHmacSHA256";
+			SecretKeyFactory factory = SecretKeyFactory.getInstance(method);
+			PBEKeySpec spec = new PBEKeySpec(password, salt, noIterations, keyLength);
+			SecretKey secretkey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
-			return Objects.equals(ciphertext, rawData);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Spurious encryption error");
-		}
-
-	}
-
-	public byte[] decryptPBKDF2WithHmacSHA256(byte[] ciphertext, byte[] iv) {
-		try {
 			/* Decrypt the message, given derived key and initialization vector. */
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.DECRYPT_MODE, secretkey, new IvParameterSpec(iv));
