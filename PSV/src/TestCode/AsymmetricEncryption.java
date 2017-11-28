@@ -1,6 +1,8 @@
 package TestCode;
 
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -11,7 +13,7 @@ import java.security.spec.*;
 public class AsymmetricEncryption {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException {
-		AsymmetricEncryption app = new AsymmetricEncryption() ;
+		AsymmetricEncryption app = new AsymmetricEncryption();
 		app.generateKeyPairs();
 	}
 
@@ -29,7 +31,6 @@ public class AsymmetricEncryption {
 			pub = fact.getKeySpec(kp.getPublic(), RSAPublicKeySpec.class);
 			priv = fact.getKeySpec(kp.getPrivate(), RSAPrivateKeySpec.class);
 		} catch (InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -54,4 +55,32 @@ public class AsymmetricEncryption {
 			oout.close();
 		}
 	}
+
+	public void readFromFile(String fileName) {
+		FileInputStream keyfis;
+		try {
+			keyfis = new FileInputStream(fileName);
+			byte[] encKey = new byte[keyfis.available()];
+			keyfis.read(encKey);
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(encKey);
+			KeyFactory kf = KeyFactory.getInstance("RSA");
+			// new BigInteger (1, b64dec.decodeBuffer(modulusBase64)), new BigInteger(1,
+			// b64dec.decodeBuffer(exponentBase64)));
+			// keyfis.close();
+			// KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+			// RSAPublicKeySpec pubKeySpec = keyFactory.getKeySpec(encKey,
+			// RSAPublicKeySpec.class);
+			// PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 }
