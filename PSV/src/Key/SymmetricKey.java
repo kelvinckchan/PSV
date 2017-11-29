@@ -32,7 +32,7 @@ public class SymmetricKey {
 		return keyName.get();
 	}
 
-	public SymmetricKey setkeyName(String keyName) {
+	public SymmetricKey setKeyName(String keyName) {
 		this.keyName.set(keyName);
 		return this;
 	}
@@ -50,7 +50,6 @@ public class SymmetricKey {
 		this.keyInfo.set(keyInfo);
 		return this;
 	}
-	
 
 	@XmlElement(name = "secKey")
 	@XmlJavaTypeAdapter(SymmetricKeyAdapter.class)

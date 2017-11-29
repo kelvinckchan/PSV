@@ -3,11 +3,16 @@
     <symmetricKey>
         <keyInfo>AES</keyInfo>
         <keyName>k1</keyName>
-        <secKey>A/fGFVK8e6aL2dsIfVEE0aY=</secKey>
+        <secKey>A5vh6UPnTiVB0NEv0J+rbmI=</secKey>
     </symmetricKey>
     <symmetricKey>
         <keyInfo>DES</keyInfo>
         <keyName>k2</keyName>
-        <secKey>AbkWczE3WOwN</secKey>
+        <secKey>AVLceW7Q0wub</secKey>
+    </symmetricKey>
+    <symmetricKey>
+        <keyInfo>DESede</keyInfo>
+        <keyName>k3</keyName>
+        <secKey>AkarusfNFY/HeW0W06tMvDHCujvacFcIcw==</secKey>
     </symmetricKey>
 </symmetricKeys>

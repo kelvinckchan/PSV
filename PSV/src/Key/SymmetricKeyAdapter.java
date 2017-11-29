@@ -1,5 +1,6 @@
 package Key;
 
+import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -16,29 +17,37 @@ public class SymmetricKeyAdapter extends XmlAdapter<byte[], SecretKey> {
 
 	@Override
 	public SecretKey unmarshal(byte[] v) throws Exception {
-		byte[] type = Arrays.copyOfRange(v, 0, 1);
-		byte[] key = Arrays.copyOfRange(v, 1, v.length);
-		return readKey(type[0], key);
+		return byteArrayToSecretKey(v);
 	}
 
 	@Override
 	public byte[] marshal(SecretKey v) throws Exception {
+		return secretKeyToByteArray(v);
+	}
+
+	public byte[] secretKeyToByteArray(SecretKey v) {
 		byte[] out = v.getEncoded();
-//		System.out.println(v.getAlgorithm()+" out> "+out.length);
+		// System.out.println(v.getAlgorithm()+" out> "+out.length);
 		switch (v.getAlgorithm()) {
 		case "DES":
-			out=EncryptionUtil.concateByte(new byte[] {(byte)1}, out);
+			out = EncryptionUtil.concateByte(new byte[] { (byte) 1 }, out);
 			break;
 		case "DESede":
-			out=EncryptionUtil.concateByte(new byte[] {(byte)2}, out);
+			out = EncryptionUtil.concateByte(new byte[] { (byte) 2 }, out);
 			break;
 		case "AES":
-			out=EncryptionUtil.concateByte(new byte[] {(byte)3}, out);
+			out = EncryptionUtil.concateByte(new byte[] { (byte) 3 }, out);
 			break;
 		default:
 			break;
 		}
 		return out;
+	}
+
+	public SecretKey byteArrayToSecretKey(byte[] v) throws Exception {
+		byte[] type = Arrays.copyOfRange(v, 0, 1);
+		byte[] key = Arrays.copyOfRange(v, 1, v.length);
+		return readKey(type[0], key);
 	}
 
 	public SecretKey readKey(byte type, byte[] rawkey) throws Exception {

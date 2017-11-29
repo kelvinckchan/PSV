@@ -106,25 +106,28 @@ public class SymmetricEncryption {
 		// System.out.println("decrypt AES_ECB_PKCS5Padding> " + new
 		// String(AES_ECB_PKCS5PaddingDe));
 
-		SymmetricKey k1 = new SymmetricKey().setkeyName("k1").setKeyInfo(AES128Key.getAlgorithm()).setSeckey(AES128Key);
+		SymmetricKey k1 = new SymmetricKey().setKeyName("k1").setKeyInfo(AES128Key.getAlgorithm()).setSeckey(AES128Key);
 		symmetricKeys.add(k1);
-		symmetricKeys.add(new SymmetricKey().setkeyName("k2").setKeyInfo(DES56Key.getAlgorithm()).setSeckey(DES56Key));
-		symmetricKeys.forEach(k -> {
-			System.out.println(k.getKeyInfo()+ "> " + k.getSeckey());
-		});
-		
-		saveModelDataToFile(new File("./testStoreSysKey.xml"));
-		loadModelDataFromFile(new File("./testStoreSysKey.xml"));
+		symmetricKeys.add(new SymmetricKey().setKeyName("k2").setKeyInfo(DES56Key.getAlgorithm()).setSeckey(DES56Key));
+		symmetricKeys.add(
+				new SymmetricKey().setKeyName("k3").setKeyInfo(TriDES168Key.getAlgorithm()).setSeckey(TriDES168Key));
 
-		readsymmetricKeys.forEach(k -> {
-			System.out.println(k.getKeyInfo() + "> " + k.getSeckey());
+		symmetricKeys.forEach(k -> {
+			System.out.println(k.getKeyName()+ "> " + k.getSeckey());
+		});
+
+		saveSymmetricKeyToFile(new File("./testStoreSysKey.xml"));
+		loadSymmetricKeyFromFile(new File("./testStoreSysKey.xml"));
+
+		symmetricKeys.forEach(k -> {
+			System.out.println(k.getKeyName() + "> " + k.getSeckey());
 		});
 
 		// try {
 		// SecretKey readAES = readKey(k1.getKeyInfo(), k1.getSeckey().getEncoded());
 		// System.out.println("Read AESKey> " + readAES + " : " +
 		// readAES.getAlgorithm());
-		// byte[] dataByte = data.getBytes("UTF-8");
+//		 byte[] dataByte = data.getBytes("UTF-8");
 		// testENDE(ECB_PKCS5Padding, readAES, dataByte);
 		// testENDE(ECB_PKCS5Padding, DES56Key, dataByte);
 		// testENDE(ECB_PKCS5Padding, TriDES168Key, dataByte);
@@ -155,21 +158,14 @@ public class SymmetricEncryption {
 
 	List<SymmetricKey> symmetricKeys = new ArrayList<>();
 
-	public void saveModelDataToFile(File file) {
-
+	public void saveSymmetricKeyToFile(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(SymmetricKeyWrapper.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-			// Wrapping our model data.
 			SymmetricKeyWrapper wrapper = new SymmetricKeyWrapper();
-
 			wrapper.setSymmetricKeys(symmetricKeys);
-
-			// Marshalling and saving XML to the file.
 			m.marshal(wrapper, file);
-
 			// Save the file path to the registry.
 			// setModelFilePath(file);
 		} catch (Exception e) { // catches ANY exception
@@ -177,22 +173,15 @@ public class SymmetricEncryption {
 		}
 	}
 
-	List<SymmetricKey> readsymmetricKeys = new ArrayList<>();
-
-	public void loadModelDataFromFile(File file) {
+	public void loadSymmetricKeyFromFile(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(SymmetricKeyWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
-
-			// Reading XML from the file and unmarshalling.
 			SymmetricKeyWrapper wrapper = (SymmetricKeyWrapper) um.unmarshal(file);
-
-			readsymmetricKeys.clear();
-			readsymmetricKeys.addAll(wrapper.getSymmetricKeys());
-
+			symmetricKeys.clear();
+			symmetricKeys.addAll(wrapper.getSymmetricKeys());
 			// // Save the file path to the registry.
 			// setModelFilePath(file);
-
 		} catch (Exception e) { // catches ANY exception
 			e.printStackTrace();
 		}

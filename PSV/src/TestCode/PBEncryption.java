@@ -134,10 +134,10 @@ public class PBEncryption {
 
 			/* Encrypt the message. */
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			
+
 			AlgorithmParameters params = cipher.getParameters();
 			byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-			cipher.init(Cipher.ENCRYPT_MODE, secretkey);
+			cipher.init(Cipher.ENCRYPT_MODE, secretkey, new IvParameterSpec(iv));
 			byte[] cipherText = cipher.doFinal(data);
 
 			return EncryptionUtil.concateByte(salt, iv, cipherText);
