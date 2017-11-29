@@ -133,7 +133,6 @@ public class AsymTabController {
 					: selectedKey.getKeyPair().getPublic();
 			PrivateKey pri = selectedKey.getPrivateKey() != null ? selectedKey.getPrivateKey()
 					: selectedKey.getKeyPair().getPrivate();
-
 			if (exportTypeCbx.getValue().equals("KeyPair")) {
 				AsymmetricEncryption.savePublicKey(pub, file);
 				file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
@@ -163,9 +162,13 @@ public class AsymTabController {
 			} else if (exportTypeCbx.getValue().equals("PrivateKey")) {
 				pri = (PrivateKey) AsymmetricEncryption.readKeyFromFile(file.getAbsolutePath(), "Private");
 			}
-
+			AsymmetricKey tempKey = null;
 			if (pub != null || pri != null) {
-				AsymmetricKey tempKey = new AsymmetricKey().setPrivateKey(pri).setPublicKey(pub);
+				if (pub != null)
+					tempKey = new AsymmetricKey().setPublicKey(pub);
+				if (pri != null)
+					tempKey.setPrivateKey(pri);
+
 				boolean okClicked = mainApp.showAsymKeyEditDialog(tempKey);
 
 				if (okClicked) {
