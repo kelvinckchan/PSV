@@ -102,6 +102,42 @@ public class RootLayoutController {
 			mainApp.saveSymKeyToFile(file);
 		}
 	}
+	
+	@FXML
+	private void handleReadAsymKey() {
+		FileChooser fileChooser = new FileChooser();
+
+		// Set extension filter
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		fileChooser.getExtensionFilters().add(extFilter);
+
+		// Show open file dialog
+		File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+		if (file != null) {
+			mainApp.loadAsymKeyFromFile(file);
+		}
+	}
+	@FXML
+	private void handleSaveAsymKey() {
+		FileChooser fileChooser = new FileChooser();
+
+		// Set extension filter
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		fileChooser.getExtensionFilters().add(extFilter);
+
+		// Show save file dialog
+		File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+
+		if (file != null) {
+			// Make sure it has the correct extension
+			if (!file.getPath().endsWith(".xml")) {
+				file = new File(file.getPath() + ".xml");
+			}
+			mainApp.saveAsymKeyToFile(file);
+		}
+	}
+
+	
 
 	/**
 	 * Opens a FileChooser to let the user select a file to save to.

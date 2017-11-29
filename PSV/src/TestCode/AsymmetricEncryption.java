@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,20 +84,21 @@ public class AsymmetricEncryption {
 			// String path = filePath.toAbsolutePath().toString();
 			// String sigPath = path.replace(path.substring(path.lastIndexOf(".")), ".sig");
 			// System.out.println("read sigPath> " + sigPath);
-			
-//			byte[] readdata = Files.readAllBytes(Paths.get("testStoreAsyKey.xml"));
-//
-//			String SigningMethod = "SHA1withRSA";
-//			SigningMethod = "MD5withRSA";
 
-//			byte[] s = sign(readdata, SigningMethod, readkp.getPrivate());
-//			System.out.println("dataByte> " + readdata);
-//			System.out.println("Signed> " + s);
-//			generateSigFile(s, Paths.get("testStoreAsyKey.xml"));
-//			byte[] reads = readSigFile(Paths.get("testStoreAsyKey.sig"));
-//			System.out.println("read Signed> " + reads);
-//			boolean isCorrect = verify(readdata, SigningMethod, reads, readkp.getPublic());
-//			System.out.println("Signature correct: " + isCorrect);
+			// byte[] readdata = Files.readAllBytes(Paths.get("testStoreAsyKey.xml"));
+			//
+			// String SigningMethod = "SHA1withRSA";
+			// SigningMethod = "MD5withRSA";
+
+			// byte[] s = sign(readdata, SigningMethod, readkp.getPrivate());
+			// System.out.println("dataByte> " + readdata);
+			// System.out.println("Signed> " + s);
+			// generateSigFile(s, Paths.get("testStoreAsyKey.xml"));
+			// byte[] reads = readSigFile(Paths.get("testStoreAsyKey.sig"));
+			// System.out.println("read Signed> " + reads);
+			// boolean isCorrect = verify(readdata, SigningMethod, reads,
+			// readkp.getPublic());
+			// System.out.println("Signature correct: " + isCorrect);
 
 			// testENDE(dataByte, readpub, readpri);
 			// testENDE(dataByte, readpri, readpub);
@@ -217,14 +219,14 @@ public class AsymmetricEncryption {
 		Files.write(Paths.get(checkSumPath), getCheckSum(mode, Files.readAllBytes(file.toPath())));
 	}
 
-	//
-	public void generateDigitalSignatureFile(byte[] data, String HashMode, String method, PrivateKey privateKey,
-			String path) {
-		try {
-			byte[] HashValue = getCheckSum(HashMode, data);
-			byte[] SignedValue = sign(HashValue, method, privateKey);
-			FileUtil.exportByteArrayToFile(path, SignedValue);
+	public static void generateDigitalSignatureFile(File file, String method, PrivateKey privateKey, String path) {
+		generateDigitalSignatureFile(FileUtil.importByteArrayFromFile(file), method, privateKey, path);
+	}
 
+	public static void generateDigitalSignatureFile(byte[] data, String method, PrivateKey privateKey, String path) {
+		try {
+			byte[] SignedValue = sign(data, method, privateKey);
+			FileUtil.exportByteArrayToFile(path, SignedValue);
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		}
@@ -269,7 +271,7 @@ public class AsymmetricEncryption {
 		return null;
 	}
 
-	public KeyPair generateKeyPair(int keySize) {
+	public static KeyPair generateKeyPair(int keySize) {
 		try {
 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 			kpg.initialize(keySize);
@@ -331,6 +333,11 @@ public class AsymmetricEncryption {
 		return FileUtil.importByteArrayFromFile(filePath.toAbsolutePath().toString());
 	}
 
+	public static boolean verify(File file, String method, File sig, PublicKey pub)
+			throws InvalidKeyException, SignatureException {
+		return verify(FileUtil.importByteArrayFromFile(file), method, FileUtil.importByteArrayFromFile(sig), pub);
+	}
+
 	public static boolean verify(byte[] data, String method, byte[] signature, PublicKey publicKey)
 			throws InvalidKeyException, SignatureException {
 		try {
@@ -346,7 +353,35 @@ public class AsymmetricEncryption {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void saveKeyPair(KeyPair kp) {
+	public static void savePublicKey(PublicKey k, File file) {
+		try {
+			KeyFactory fact = KeyFactory.getInstance("RSA");
+			RSAPublicKeySpec pub = fact.getKeySpec(k, RSAPublicKeySpec.class);
+			saveToFile(file.getAbsolutePath(), pub.getModulus(), pub.getPublicExponent());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	public static void savePrivateKey(PrivateKey k, File file) {
+		try {
+			KeyFactory fact = KeyFactory.getInstance("RSA");
+			RSAPrivateKeySpec priv = fact.getKeySpec(k, RSAPrivateKeySpec.class);
+			saveToFile(file.getAbsolutePath(), priv.getModulus(), priv.getPrivateExponent());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	public static void saveKeyPair(KeyPair kp) {
 		try {
 			KeyFactory fact = KeyFactory.getInstance("RSA");
 			RSAPublicKeySpec pub = fact.getKeySpec(kp.getPublic(), RSAPublicKeySpec.class);
@@ -362,7 +397,7 @@ public class AsymmetricEncryption {
 		}
 	}
 
-	public void saveToFile(String fileName, BigInteger mod, BigInteger exp) throws IOException {
+	public static void saveToFile(String fileName, BigInteger mod, BigInteger exp) throws IOException {
 		ObjectOutputStream oout = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
 		try {
 			oout.writeObject(mod);
@@ -377,22 +412,28 @@ public class AsymmetricEncryption {
 	// RSAPrivateKeySpec rsaPublickeySpec;
 	// RSAPublicKeySpec rsaPrivatekeySpec;
 
-	public Key readKeyFromFile(String keyFileName, String Type) throws IOException {
-		InputStream in = new FileInputStream(keyFileName);
-		ObjectInputStream oin = new ObjectInputStream(new BufferedInputStream(in));
+	public static Key readKeyFromFile(String keyFileName, String Type) {
 		try {
-			BigInteger m = (BigInteger) oin.readObject();
-			BigInteger e = (BigInteger) oin.readObject();
-			KeyFactory keyFact = KeyFactory.getInstance("RSA");
-			if (Type.equals("Private")) {
-				return keyFact.generatePrivate(new RSAPrivateKeySpec(m, e));
-			} else if (Type.equals("Public")) {
-				return keyFact.generatePublic(new RSAPublicKeySpec(m, e));
+			InputStream in = new FileInputStream(keyFileName);
+			ObjectInputStream oin = new ObjectInputStream(new BufferedInputStream(in));
+			try {
+				BigInteger m = (BigInteger) oin.readObject();
+				BigInteger e = (BigInteger) oin.readObject();
+				KeyFactory keyFact = KeyFactory.getInstance("RSA");
+				if (Type.equals("Private")) {
+					return keyFact.generatePrivate(new RSAPrivateKeySpec(m, e));
+				} else if (Type.equals("Public")) {
+					return keyFact.generatePublic(new RSAPublicKeySpec(m, e));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("Spurious serialisation error", e);
+			} finally {
+				oin.close();
 			}
-		} catch (Exception e) {
-			throw new RuntimeException("Spurious serialisation error", e);
-		} finally {
-			oin.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 		return null;
 	}

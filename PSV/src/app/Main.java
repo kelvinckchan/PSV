@@ -14,6 +14,7 @@ import javax.xml.bind.Unmarshaller;
 
 import TestCode.FileUtil;
 import app.model.AsymmetricKey;
+import app.model.AsymmetricKeyWrapper;
 import app.model.SymmetricKey;
 import app.model.SymmetricKeyWrapper;
 import app.model.UserInfo;
@@ -21,6 +22,7 @@ import app.model.UserInfoWrapper;
 import app.util.PBEncryption;
 import app.view.UserInfoEditDialogController;
 import app.view.SymKeyEditDialogController;
+import app.view.AsymKeyEditDialogController;
 import app.view.LoginController;
 import app.view.RootLayoutController;
 import app.view.TabpanelController;
@@ -151,8 +153,37 @@ public class Main extends Application {
 			return false;
 		}
 	}
+	public boolean showAsymKeyEditDialog(AsymmetricKey selectedKey) {
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("view/AsymKeyEditDialog.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
 
-	public boolean showKeyEditDialog(SymmetricKey selectedKey) {
+			// Create the dialog Stage.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Edit Sym Key");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(page);
+			scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
+			dialogStage.setScene(scene);
+
+			// Set the model into the controller.
+			AsymKeyEditDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setModel(selectedKey);
+
+			// Show the dialog and wait until the user closes it
+			dialogStage.showAndWait();
+
+			return controller.isOkClicked();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	public boolean showSymKeyEditDialog(SymmetricKey selectedKey) {
 		try {
 			// Load the fxml file and create a new stage for the popup dialog.
 			FXMLLoader loader = new FXMLLoader();
@@ -256,7 +287,32 @@ public class Main extends Application {
 			symmetricKeyData.addAll(wrapper.getSymmetricKeys());
 
 			// Save the file path to the registry.
-			setModelFilePath(file);
+//			setModelFilePath(file);
+
+		} catch (Exception e) { // catches ANY exception
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Could not load data");
+			alert.setContentText("Could not load data from file:\n" + file.getPath());
+
+			alert.showAndWait();
+		}
+	}
+	public void loadAsymKeyFromFile(File file) {
+		try {
+
+			JAXBContext context = JAXBContext.newInstance(AsymmetricKeyWrapper.class);
+			Unmarshaller um = context.createUnmarshaller();
+
+			// Reading XML from the file and unmarshalling.
+			AsymmetricKeyWrapper wrapper = (AsymmetricKeyWrapper) um
+					.unmarshal(new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file)));
+
+			asymmetricKeyData.clear();
+			asymmetricKeyData.addAll(wrapper.getAsymmetricKeys());
+
+			// Save the file path to the registry.
+//			setModelFilePath(file);
 
 		} catch (Exception e) { // catches ANY exception
 			Alert alert = new Alert(AlertType.ERROR);
@@ -291,7 +347,29 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
+	public void saveAsymKeyToFile(File file) {
+		try {
+			JAXBContext context = JAXBContext.newInstance(AsymmetricKeyWrapper.class);
+			Marshaller m = context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			AsymmetricKeyWrapper wrapper = new AsymmetricKeyWrapper();
+			wrapper.setAsymmetricKeys(asymmetricKeyData);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			m.marshal(wrapper, out);
 
+			FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
+					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
+
+//			setModelFilePath(file);
+		} catch (Exception e) { // catches ANY exception
+			e.printStackTrace();
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Could not save data");
+			alert.setContentText("Could not save data to file:\n" + file.getPath());
+			alert.showAndWait();
+		}
+	}
 	public void saveUserInfoToFile(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
@@ -375,5 +453,7 @@ public class Main extends Application {
 			return null;
 		}
 	}
+
+
 
 }

@@ -7,13 +7,20 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="anchor" prefHeight="315.0" prefWidth="532.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.TabpanelController">
-   <children>
-      <TabPane fx:id="tabPane" prefHeight="315.0" prefWidth="532.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <tabs>
-          <Tab fx:id="userInfoTab" text="User Info" />
-          <Tab fx:id="symTab" text="Sym" />
-        </tabs>
-      </TabPane>
-   </children>
+<AnchorPane id="anchor" prefHeight="315.0" prefWidth="532.0"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="app.view.TabpanelController">
+	<children>
+		<TabPane fx:id="tabPane" prefHeight="315.0" prefWidth="532.0"
+			tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0"
+			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+			AnchorPane.topAnchor="0.0">
+			<tabs>
+				<Tab fx:id="userInfoTab" text="User Info" />
+				<Tab fx:id="symTab" text="Sym" />
+				<Tab fx:id="asymTab" text="Asym" />
+				<Tab fx:id="checksumTab" text="CheckSum" />
+			</tabs>
+		</TabPane>
+	</children>
 </AnchorPane>

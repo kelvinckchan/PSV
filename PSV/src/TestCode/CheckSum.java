@@ -17,7 +17,7 @@ public class CheckSum {
 		CheckSum app = new CheckSum();
 		app.callCheckSum();
 	}
-	
+
 	void callCheckSum() {
 		try {
 			generateCheckSun("MD5", new File("TestCheckSum"));
@@ -41,7 +41,7 @@ public class CheckSum {
 		return newCheckSum.equals(existCheckSum);
 	}
 
-	public void generateCheckSun(String mode, File file) throws IOException {
+	public static void generateCheckSun(String mode, File file) throws IOException {
 		String format = "";
 		if (mode.equals("MD5")) {
 			format = ".md5";
@@ -52,7 +52,7 @@ public class CheckSum {
 		Files.write(Paths.get(checkSumPath), getCheckSum(mode, Files.readAllBytes(file.toPath())));
 	}
 
-	public byte[] getCheckSum(String mode, byte[] data) {
+	public static byte[] getCheckSum(String mode, byte[] data) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(mode);
 			md.update(data);
@@ -61,6 +61,10 @@ public class CheckSum {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static byte[] getCheckSum(String mode, File file) {
+		return getCheckSum(mode, FileUtil.importByteArrayFromFile(file));
 	}
 
 }

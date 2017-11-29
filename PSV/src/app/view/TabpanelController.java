@@ -35,10 +35,18 @@ public class TabpanelController {
 	@FXML
 	private Tab symTab;
 	@FXML
+	private Tab asymTab;
+	@FXML
+	private Tab checksumTab;
+	@FXML
 	private UserInfoTabController userInfoTabController;
 	@FXML
 	private SymTabController symTabController;
-	
+	@FXML
+	private AsymTabController asymTabController;
+	@FXML
+	private CheckSumTabController checkSumTabController;
+
 	public TabpanelController() {
 	}
 
@@ -47,12 +55,23 @@ public class TabpanelController {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/userInfoTab.fxml"));
-			userInfoTab.setContent(loader.load());;
+			userInfoTab.setContent(loader.load());
 			userInfoTabController = loader.getController();
+
 			loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/SymTab.fxml"));
-			symTab.setContent(loader.load());;
+			symTab.setContent(loader.load());
 			symTabController = loader.getController();
+
+			loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("view/AsymTab.fxml"));
+			asymTab.setContent(loader.load());
+			asymTabController = loader.getController();
+
+			loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("view/CheckSumTab.fxml"));
+			checksumTab.setContent(loader.load());
+			checkSumTabController = loader.getController();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -62,6 +81,8 @@ public class TabpanelController {
 		this.mainApp = mainApp;
 		userInfoTabController.setMainApp(mainApp);
 		symTabController.setMainApp(mainApp);
+		asymTabController.setMainApp(mainApp);
+		checkSumTabController.setMainApp(mainApp);
 	}
 
 }

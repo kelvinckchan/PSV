@@ -52,7 +52,7 @@ public class SymmetricEncryption {
 	protected final static int KeyLen_3DES_112 = 112;
 	protected final static int KeyLen_3DES_168 = 168;
 	protected final static int KeyLen_AES_128 = 128;
-	protected final static int KeyLen_AES_198 = 198;
+	protected final static int KeyLen_AES_192 = 192;
 	protected final static int KeyLen_AES_256 = 256;
 
 	protected final static String DES_ECB_PKCS5Padding = "DES/ECB/PKCS5Padding";

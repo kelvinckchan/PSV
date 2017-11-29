@@ -21,9 +21,16 @@ import javafx.scene.control.TableView;
 public class SymTabController {
 
 	private ObservableList<String> keyTypCbxList = FXCollections.observableArrayList("DES", "DESede", "AES");
-	private ObservableList<String> AESkeyLengthCbxList = FXCollections.observableArrayList("128", "198", "256");
+	private ObservableList<String> AESkeyLengthCbxList = FXCollections.observableArrayList("128", "192", "256");
 	private ObservableList<String> DESkeyLengthCbxList = FXCollections.observableArrayList("56");
 	private ObservableList<String> DESedekeyLengthCbxList = FXCollections.observableArrayList("112", "168");
+
+	protected final static String ECB = "/ECB/PKCS5Padding";
+	protected final static String CBC = "/CBC/PKCS5Padding";
+	protected final static String CFB = "/CFB/PKCS5Padding";
+	protected final static String OFB = "/OFB/PKCS5Padding";
+	protected final static String CTR = "/CTR/PKCS5Padding";
+	private ObservableList<String> methodCbxList = FXCollections.observableArrayList(ECB, CBC, CFB, OFB, CTR);
 	@FXML
 	private TableView<SymmetricKey> SymmetricKeyTable;
 	@FXML
@@ -34,7 +41,8 @@ public class SymTabController {
 	private ComboBox<String> keyTypCbx;
 	@FXML
 	private ComboBox<String> keyLengthCbx;
-
+	@FXML
+	private ComboBox<String> methodCbx;
 	// @FXML
 	// private Label accountNameLabel;
 	// @FXML
@@ -62,7 +70,7 @@ public class SymTabController {
 		// Initialize the SymmetricKey table with the two columns.
 		keyNameColumn.setCellValueFactory(cellData -> cellData.getValue().keyNameProperty());
 		keyInfoColumn.setCellValueFactory(cellData -> cellData.getValue().keyInfoProperty());
-
+		methodCbx.setItems(methodCbxList);
 		keyTypCbx.setItems(keyTypCbxList);
 		keyTypCbx.valueProperty().addListener((obs, oldValue, newValue) -> {
 			if (newValue == null) {
@@ -115,12 +123,15 @@ public class SymTabController {
 
 	@FXML
 	private void handleEncrypt() {
+
 		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
-		if (selectedKey != null) {
+		if (selectedKey != null && !methodCbx.getSelectionModel().isEmpty()) {
 			FileChooser fileChooser = new FileChooser();
 			File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
 			if (file != null) {
-				SymmetricEncryption.encrypt(selectedKey.getSeckey(), FileUtil.importByteArrayFromFile(file));
+				FileUtil.exportByteArrayToFile(file.getAbsolutePath(), SymmetricEncryption.encrypt(methodCbx.getValue(),
+						selectedKey.getSeckey(), FileUtil.importByteArrayFromFile(file)));
+				showSuccessDialog();
 			}
 		} else {
 			showNothingSelectedAlertDialog();
@@ -130,11 +141,23 @@ public class SymTabController {
 	@FXML
 	private void handleDecrypt() {
 		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
-		if (selectedKey != null) {
+		if (selectedKey != null && !methodCbx.getSelectionModel().isEmpty()) {
 			FileChooser fileChooser = new FileChooser();
 			File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
 			if (file != null) {
-				SymmetricEncryption.decrypt(selectedKey.getSeckey(), FileUtil.importByteArrayFromFile(file));
+				try {
+					FileUtil.exportByteArrayToFile(file.getAbsolutePath(), SymmetricEncryption.decrypt(
+							methodCbx.getValue(), selectedKey.getSeckey(), FileUtil.importByteArrayFromFile(file)));
+					showSuccessDialog();
+				} catch (Exception e) {
+					Alert alert = new Alert(AlertType.WARNING);
+					alert.initOwner(mainApp.getPrimaryStage());
+					alert.setTitle("Fail");
+					// alert.setHeaderText("No SymmetricKey Selected");
+					alert.setHeaderText(null);
+					alert.setContentText("Decryption Failed! Change Key or Algorithm!");
+					alert.showAndWait();
+				}
 			}
 		} else {
 			showNothingSelectedAlertDialog();
@@ -175,12 +198,12 @@ public class SymTabController {
 					Integer.parseInt(keyLengthCbx.getValue()));
 			if (sk != null) {
 				SymmetricKey tempKey = new SymmetricKey().setSeckey(sk);
-				boolean okClicked = mainApp.showKeyEditDialog(tempKey);
+				boolean okClicked = mainApp.showSymKeyEditDialog(tempKey);
 
 				if (okClicked) {
 					mainApp.getSymmetricKeyData().add(tempKey);
 				}
-			}else {
+			} else {
 				Alert alert = new Alert(AlertType.WARNING);
 				alert.initOwner(mainApp.getPrimaryStage());
 				alert.setTitle("Key Generation Error!");
@@ -200,7 +223,7 @@ public class SymTabController {
 	private void handleEditKey() {
 		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
 		if (selectedKey != null) {
-			boolean okClicked = mainApp.showKeyEditDialog(selectedKey);
+			boolean okClicked = mainApp.showSymKeyEditDialog(selectedKey);
 			if (okClicked) {
 				// showKeyDetails(selectedKey);
 			}
@@ -209,6 +232,17 @@ public class SymTabController {
 			// Nothing selected.
 			showNothingSelectedAlertDialog();
 		}
+	}
+
+	private void showSuccessDialog() {
+		// Nothing selected.
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.initOwner(mainApp.getPrimaryStage());
+		alert.setTitle("Done. ");
+		// alert.setHeaderText("No SymmetricKey Selected");
+		alert.setHeaderText(null);
+		alert.setContentText("Done! Please check.");
+		alert.showAndWait();
 	}
 
 	private void showNothingSelectedAlertDialog() {

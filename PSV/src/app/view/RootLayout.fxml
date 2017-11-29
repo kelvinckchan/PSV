@@ -25,6 +25,13 @@
                   <MenuItem mnemonicParsing="false" onAction="#handleSaveSymKey" text="Save Sym Key" />
                </items>
             </Menu>
+            <Menu mnemonicParsing="false" text="Asym Key">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleNew" text="New" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleReadAsymKey" text="Read Asym Key" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleSaveAsymKey" text="Save Asym Key" />
+               </items>
+            </Menu>
         </menus>
       </MenuBar>
    </top>
