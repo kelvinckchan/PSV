@@ -33,9 +33,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import Key.SymmetricKey;
-import Key.SymmetricKeyWrapper;
 import app.model.ModelWrapper;
+import app.model.SymmetricKey;
+import app.model.SymmetricKeyWrapper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 

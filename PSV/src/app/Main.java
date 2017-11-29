@@ -1,5 +1,7 @@
 package app;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
@@ -9,12 +11,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import TestCode.FileUtil;
 import app.model.Model;
 import app.model.ModelWrapper;
+import app.util.PBEncryption;
 import app.view.EditDialogController;
 import app.view.LoginController;
 import app.view.RootLayoutController;
-import app.view.ViewController;
+import app.view.TabpanelController;
+import app.view.UserInfoTabController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -87,14 +92,14 @@ public class Main extends Application {
 		try {
 			// Load model overview.
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Main.class.getResource("view/View.fxml"));
-			AnchorPane personOverview = (AnchorPane) loader.load();
+			loader.setLocation(Main.class.getResource("view/Tabpanel.fxml"));
+			AnchorPane Tabpanel = (AnchorPane) loader.load();
 
 			// Set model overview into the center of root layout.
-			rootLayout.setCenter(personOverview);
+			rootLayout.setCenter(Tabpanel);
 
 			// Give the controller access to the main app.
-			ViewController controller = loader.getController();
+			TabpanelController controller = loader.getController();
 			controller.setMainApp(this);
 
 		} catch (IOException e) {
@@ -185,11 +190,13 @@ public class Main extends Application {
 	 */
 	public void loadModelDataFromFile(File file) {
 		try {
+			
+			ByteArrayInputStream in = new ByteArrayInputStream(	PBEncryption.decryptPBKDF2WithHmacSHA256(file));
 			JAXBContext context = JAXBContext.newInstance(ModelWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
 
 			// Reading XML from the file and unmarshalling.
-			ModelWrapper wrapper = (ModelWrapper) um.unmarshal(file);
+			ModelWrapper wrapper = (ModelWrapper) um.unmarshal(in);
 
 			modelData.clear();
 			modelData.addAll(wrapper.getModels());
@@ -217,22 +224,20 @@ public class Main extends Application {
 			JAXBContext context = JAXBContext.newInstance(ModelWrapper.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-			// Wrapping our model data.
 			ModelWrapper wrapper = new ModelWrapper();
 			wrapper.setModels(modelData);
-
-			// Marshalling and saving XML to the file.
-			m.marshal(wrapper, file);
-
-			// Save the file path to the registry.
+			 ByteArrayOutputStream out = new ByteArrayOutputStream();
+			m.marshal(wrapper, out);
+			
+			FileUtil.exportByteArrayToFile(file.getAbsolutePath(), PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
+			
+			
 			setModelFilePath(file);
 		} catch (Exception e) { // catches ANY exception
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Could not save data");
 			alert.setContentText("Could not save data to file:\n" + file.getPath());
-
 			alert.showAndWait();
 		}
 	}

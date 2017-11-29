@@ -34,8 +34,8 @@ import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import org.junit.jupiter.api.Test;
 
-import Key.AsymmetricKey;
-import Key.AsymmetricKeyWrapper;
+import app.model.AsymmetricKey;
+import app.model.AsymmetricKeyWrapper;
 
 public class AsymmetricEncryption {
 

@@ -1,4 +1,4 @@
-package Key;
+package app.model;
 
 import java.io.IOException;
 import java.security.KeyFactory;

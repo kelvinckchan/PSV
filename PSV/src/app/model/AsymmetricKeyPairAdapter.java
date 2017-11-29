@@ -1,4 +1,4 @@
-package Key;
+package app.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

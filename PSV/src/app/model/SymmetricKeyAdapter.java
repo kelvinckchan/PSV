@@ -1,4 +1,4 @@
-package Key;
+package app.model;
 
 import java.security.Key;
 import java.util.Arrays;

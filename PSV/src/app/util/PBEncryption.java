@@ -65,7 +65,7 @@ public class PBEncryption {
 			byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
 			cipher.init(Cipher.ENCRYPT_MODE, secretkey, new IvParameterSpec(iv));
 			byte[] cipherText = cipher.doFinal(data);
-
+			System.out.println("encryptPBKDF2WithHmacSHA256.");
 			return EncryptionUtil.concateByte(salt, iv, cipherText);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -88,7 +88,7 @@ public class PBEncryption {
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.DECRYPT_MODE, secretkey, new IvParameterSpec(iv));
 			byte[] plaintext = cipher.doFinal(ciphertext);
-
+			System.out.println("decryptPBKDF2WithHmacSHA256.");
 			return plaintext;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,6 +102,10 @@ public class PBEncryption {
 
 	public static byte[] encryptPBKDF2WithHmacSHA256(File pbe) {
 		return encryptPBKDF2WithHmacSHA256(FileUtil.importByteArrayFromFile(pbe), PBEpassword);
+	}
+
+	public static byte[] encryptPBKDF2WithHmacSHA256(byte[] byteArray) {
+		return encryptPBKDF2WithHmacSHA256(byteArray, PBEpassword);
 	}
 
 }

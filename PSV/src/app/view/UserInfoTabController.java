@@ -13,7 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public class ViewController {
+public class UserInfoTabController {
 
 	private ObservableList<String> comboBoxList = FXCollections.observableArrayList("DES", "3DES", "AES");
 
@@ -41,7 +41,7 @@ public class ViewController {
 	/**
 	 * The constructor. The constructor is called before the initialize() method.
 	 */
-	public ViewController() {
+	public UserInfoTabController() {
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package Key;
+package app.model;
 
 import javax.crypto.SecretKey;
 import javax.xml.bind.annotation.XmlElement;
