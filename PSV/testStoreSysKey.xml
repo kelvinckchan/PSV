@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<symmetricKeys>
+    <symmetricKey>
+        <keyInfo>AES</keyInfo>
+        <keyName>k1</keyName>
+        <secKey>A7p96A/yhmj7S56IRB132A0=</secKey>
+    </symmetricKey>
+    <symmetricKey>
+        <keyInfo>DES</keyInfo>
+        <keyName>k2</keyName>
+        <secKey>AQ5bBzLQukYv</secKey>
+    </symmetricKey>
+    <symmetricKey>
+        <keyInfo>DESede</keyInfo>
+        <keyName>k3</keyName>
+        <secKey>AiXEDkxJCGc77M5DT9X9JSmGXpvsdn/O/Q==</secKey>
+    </symmetricKey>
+</symmetricKeys>

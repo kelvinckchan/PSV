@@ -209,10 +209,14 @@ public class SymmetricEncryption {
 		return null;
 	}
 
-	public byte[] encryptDES(SecretKey sKey, byte[] data) {
-		return encrypt(null, sKey, data);
+	public static byte[] encrypt(SecretKey sKey, byte[] data) {
+		return encrypt(sKey.getAlgorithm(), sKey, data);
 	}
-
+	public static byte[] decrypt(SecretKey sKey, byte[] data) {
+		return decrypt(sKey.getAlgorithm(), sKey, data);
+	}
+	
+	
 	public SecretKey readKey(String type, byte[] rawkey) throws Exception {
 		switch (type) {
 		case "DES":
@@ -243,14 +247,14 @@ public class SymmetricEncryption {
 		return skey;
 	}
 
-	public boolean needIV(String algo) {
+	public static boolean needIV(String algo) {
 		if (algo.contains("CBC") || algo.contains("CFB") || algo.contains("OFB") || algo.contains("CTR"))
 			return true;
 		return false;
 	}
 
 	// CBC, OFB and CFB need iv
-	public byte[] encrypt(String method, SecretKey sKey, byte[] data) {
+	public static byte[] encrypt(String method, SecretKey sKey, byte[] data) {
 		try {
 			Cipher cipher = Cipher.getInstance(sKey.getAlgorithm() + method);
 			if (needIV(cipher.getAlgorithm())) {
@@ -274,7 +278,7 @@ public class SymmetricEncryption {
 		return null;
 	}
 
-	public byte[] decrypt(String method, SecretKey sKey, byte[] data) {
+	public static byte[] decrypt(String method, SecretKey sKey, byte[] data) {
 		try {
 			Cipher cipher = Cipher.getInstance(sKey.getAlgorithm() + method);
 			if (needIV(cipher.getAlgorithm())) {
@@ -294,10 +298,11 @@ public class SymmetricEncryption {
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
 		} catch (InvalidAlgorithmParameterException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
+
+
 
 }

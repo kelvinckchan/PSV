@@ -5,12 +5,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * Helper class to wrap a list of userInfos. This is used for saving the list of
- * userInfos to XML.
- * 
- * @author Marco Jakob
- */
 @XmlRootElement(name = "userInfos")
 public class UserInfoWrapper {
 

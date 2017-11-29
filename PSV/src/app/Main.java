@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.Security;
 import java.util.prefs.Preferences;
 
@@ -219,20 +220,19 @@ public class Main extends Application {
 	public void loadUserInfoFromFile(File file) {
 		try {
 
-			ByteArrayInputStream in = new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file));
 			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
 
-			// Reading XML from the file and unmarshalling.
-			UserInfoWrapper wrapper = (UserInfoWrapper) um.unmarshal(in);
+			UserInfoWrapper wrapper = (UserInfoWrapper) um
+					.unmarshal(new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file)));
 
 			userInfoData.clear();
 			userInfoData.addAll(wrapper.getUserInfos());
 
-			// Save the file path to the registry.
 			setModelFilePath(file);
 
 		} catch (Exception e) { // catches ANY exception
+			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Could not load data");
@@ -241,15 +241,16 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
+
 	public void loadSymKeyFromFile(File file) {
 		try {
 
-			ByteArrayInputStream in = new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file));
-			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
+			JAXBContext context = JAXBContext.newInstance(SymmetricKeyWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
 
 			// Reading XML from the file and unmarshalling.
-			SymmetricKeyWrapper wrapper = (SymmetricKeyWrapper) um.unmarshal(in);
+			SymmetricKeyWrapper wrapper = (SymmetricKeyWrapper) um
+					.unmarshal(new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file)));
 
 			symmetricKeyData.clear();
 			symmetricKeyData.addAll(wrapper.getSymmetricKeys());
@@ -266,9 +267,10 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
+
 	public void saveSymKeyToFile(File file) {
 		try {
-			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
+			JAXBContext context = JAXBContext.newInstance(SymmetricKeyWrapper.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			SymmetricKeyWrapper wrapper = new SymmetricKeyWrapper();
@@ -279,8 +281,9 @@ public class Main extends Application {
 			FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
 					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
 
-			setModelFilePath(file);
+//			setModelFilePath(file);
 		} catch (Exception e) { // catches ANY exception
+			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Could not save data");

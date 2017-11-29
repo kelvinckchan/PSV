@@ -99,7 +99,7 @@ public class RootLayoutController {
 			if (!file.getPath().endsWith(".xml")) {
 				file = new File(file.getPath() + ".xml");
 			}
-			mainApp.saveUserInfoToFile(file);
+			mainApp.saveSymKeyToFile(file);
 		}
 	}
 

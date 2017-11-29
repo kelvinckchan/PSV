@@ -1,7 +1,10 @@
 package app.view;
 
+import java.io.File;
+
 import javax.crypto.SecretKey;
 
+import TestCode.FileUtil;
 import TestCode.SymmetricEncryption;
 import app.Main;
 import app.model.SymmetricKey;
@@ -10,15 +13,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ChoiceBox;
+import javafx.stage.FileChooser;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 public class SymTabController {
 
-	private ObservableList<String> keyTypCbxList = FXCollections.observableArrayList("DES", "3DES", "AES");
+	private ObservableList<String> keyTypCbxList = FXCollections.observableArrayList("DES", "DESede", "AES");
 	private ObservableList<String> AESkeyLengthCbxList = FXCollections.observableArrayList("128", "198", "256");
 	private ObservableList<String> DESkeyLengthCbxList = FXCollections.observableArrayList("56");
 	private ObservableList<String> DESedekeyLengthCbxList = FXCollections.observableArrayList("112", "168");
@@ -69,7 +71,7 @@ public class SymTabController {
 				keyLengthCbx.setItems(AESkeyLengthCbxList);
 			} else if (newValue.equals("DES")) {
 				keyLengthCbx.setItems(DESkeyLengthCbxList);
-			} else if (newValue.equals("3DES")) {
+			} else if (newValue.equals("DESede")) {
 				keyLengthCbx.setItems(DESedekeyLengthCbxList);
 			}
 		});
@@ -111,6 +113,34 @@ public class SymTabController {
 	// }
 	// }
 
+	@FXML
+	private void handleEncrypt() {
+		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
+		if (selectedKey != null) {
+			FileChooser fileChooser = new FileChooser();
+			File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+			if (file != null) {
+				SymmetricEncryption.encrypt(selectedKey.getSeckey(), FileUtil.importByteArrayFromFile(file));
+			}
+		} else {
+			showNothingSelectedAlertDialog();
+		}
+	}
+
+	@FXML
+	private void handleDecrypt() {
+		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
+		if (selectedKey != null) {
+			FileChooser fileChooser = new FileChooser();
+			File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+			if (file != null) {
+				SymmetricEncryption.decrypt(selectedKey.getSeckey(), FileUtil.importByteArrayFromFile(file));
+			}
+		} else {
+			showNothingSelectedAlertDialog();
+		}
+	}
+
 	/**
 	 * Called when the user clicks on the delete button.
 	 */
@@ -143,13 +173,23 @@ public class SymTabController {
 		} else {
 			SecretKey sk = SymmetricEncryption.generateSymKey(keyTypCbx.getValue(),
 					Integer.parseInt(keyLengthCbx.getValue()));
-			SymmetricKey tempKey = new SymmetricKey().setSeckey(sk);
-			boolean okClicked = mainApp.showKeyEditDialog(tempKey);
+			if (sk != null) {
+				SymmetricKey tempKey = new SymmetricKey().setSeckey(sk);
+				boolean okClicked = mainApp.showKeyEditDialog(tempKey);
 
-			if (okClicked) {
-				mainApp.getSymmetricKeyData().add(tempKey);
+				if (okClicked) {
+					mainApp.getSymmetricKeyData().add(tempKey);
+				}
+			}else {
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.initOwner(mainApp.getPrimaryStage());
+				alert.setTitle("Key Generation Error!");
+				alert.setHeaderText(null);
+				alert.setContentText("Key Generation Error!");
+				alert.showAndWait();
 			}
 		}
+
 	}
 
 	/**

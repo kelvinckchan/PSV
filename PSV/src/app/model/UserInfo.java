@@ -11,12 +11,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-/**
- * Model class for a Person.
- *
- * @author Marco Jakob
- */
+ 
 public class UserInfo {
 
 	private final StringProperty accountName;
@@ -24,19 +19,10 @@ public class UserInfo {
 	private final StringProperty password;
 	private final StringProperty remarks;
 
-	/**
-	 * Default constructor.
-	 */
 	public UserInfo() {
 		this(null, null);
 	}
 
-	/**
-	 * Constructor with some initial data.
-	 * 
-	 * @param accountName
-	 * @param userID
-	 */
 	public UserInfo(String accountName, String userID) {
 		this.accountName = new SimpleStringProperty(accountName);
 		this.userID = new SimpleStringProperty(userID);
