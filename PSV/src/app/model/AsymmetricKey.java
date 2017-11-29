@@ -11,8 +11,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class AsymmetricKey {
-
+public class AsymmetricKey   {
 	private StringProperty keyName;
 	private StringProperty keyInfo;
 	private StringProperty Type;
@@ -24,13 +23,18 @@ public class AsymmetricKey {
 		this(null, null, null, null, null, null);
 	}
 
-	public AsymmetricKey(String keyName, String keyInfo,String Type, KeyPair keyPair, PublicKey publicKey, PrivateKey privateKey) {
+	public AsymmetricKey(String keyName, String keyInfo, String Type, KeyPair keyPair, PublicKey publicKey,
+			PrivateKey privateKey) {
 		this.keyName = new SimpleStringProperty(keyName);
 		this.keyInfo = new SimpleStringProperty(keyInfo);
 		this.keyPair = keyPair;
 		this.publicKey = publicKey;
 		this.privateKey = privateKey;
 		this.Type = new SimpleStringProperty(Type);
+	}
+
+	public AsymmetricKey(String keyName, String keyInfo) {
+		this(keyName, keyInfo, null, null, null, null);
 	}
 
 	public StringProperty keyNameProperty() {

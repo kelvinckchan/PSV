@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import TestCode.FileUtil;
 import app.Main;
-import app.model.Model;
+import app.model.UserInfo;
 import app.util.PBEncryption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,8 +33,12 @@ public class TabpanelController {
 	@FXML
 	private Tab userInfoTab;
 	@FXML
+	private Tab symTab;
+	@FXML
 	private UserInfoTabController userInfoTabController;
-
+	@FXML
+	private SymTabController symTabController;
+	
 	public TabpanelController() {
 	}
 
@@ -45,8 +49,10 @@ public class TabpanelController {
 			loader.setLocation(Main.class.getResource("view/userInfoTab.fxml"));
 			userInfoTab.setContent(loader.load());;
 			userInfoTabController = loader.getController();
-			
-			
+			loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("view/SymTab.fxml"));
+			symTab.setContent(loader.load());;
+			symTabController = loader.getController();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -55,7 +61,7 @@ public class TabpanelController {
 	public void setMainApp(Main mainApp) {
 		this.mainApp = mainApp;
 		userInfoTabController.setMainApp(mainApp);
-		
+		symTabController.setMainApp(mainApp);
 	}
 
 }

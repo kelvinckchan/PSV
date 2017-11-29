@@ -1,7 +1,7 @@
 package app.view;
 
 import app.Main;
-import app.model.Model;
+import app.model.UserInfo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,11 +18,11 @@ public class UserInfoTabController {
 	private ObservableList<String> comboBoxList = FXCollections.observableArrayList("DES", "3DES", "AES");
 
 	@FXML
-	private TableView<Model> ModelTable;
+	private TableView<UserInfo> ModelTable;
 	@FXML
-	private TableColumn<Model, String> accountNameColumn;
+	private TableColumn<UserInfo, String> accountNameColumn;
 	@FXML
-	private TableColumn<Model, String> userIDColumn;
+	private TableColumn<UserInfo, String> userIDColumn;
 	@FXML
 	private ComboBox<String> testComboBox;
 
@@ -73,7 +73,7 @@ public class UserInfoTabController {
 		this.mainApp = mainApp;
 
 		// Add observable list data to the table
-		ModelTable.setItems(mainApp.getModelData());
+		ModelTable.setItems(mainApp.getUserInfoData());
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class UserInfoTabController {
 	 * @param Model
 	 *            the Model or null
 	 */
-	private void showModelDetails(Model Model) {
+	private void showModelDetails(UserInfo Model) {
 		if (Model != null) {
 			// Fill the labels with info from the Model object.
 			accountNameLabel.setText(Model.getAccountName());
@@ -121,10 +121,10 @@ public class UserInfoTabController {
 	 */
 	@FXML
 	private void handleNewModel() {
-		Model tempModel = new Model();
+		UserInfo tempModel = new UserInfo();
 		boolean okClicked = mainApp.showModelEditDialog(tempModel);
 		if (okClicked) {
-			mainApp.getModelData().add(tempModel);
+			mainApp.getUserInfoData().add(tempModel);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class UserInfoTabController {
 	 */
 	@FXML
 	private void handleEditModel() {
-		Model selectedModel = ModelTable.getSelectionModel().getSelectedItem();
+		UserInfo selectedModel = ModelTable.getSelectionModel().getSelectedItem();
 		if (selectedModel != null) {
 			boolean okClicked = mainApp.showModelEditDialog(selectedModel);
 			if (okClicked) {

@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import TestCode.EncryptionUtil;
 import TestCode.FileUtil;
 import app.Main;
-import app.model.Model;
+import app.model.UserInfo;
 import app.util.PBEncryption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,21 +52,17 @@ public class LoginController {
 			if (file != null && file.exists()) {
 				byte[] decrypted = PBEncryption.decryptPBKDF2WithHmacSHA256(file);
 				if (decrypted != null) {
+					FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
+							PBEncryption.encryptPBKDF2WithHmacSHA256(EncryptionUtil.generateSalt(256)));
 					mainApp.showView();
 				} else {
 					showWrongPasswordAlertDialog();
 				}
 			} else {
-
-				try {
-					File pbe = new File("PBE");
-					pbe.createNewFile();
-					FileUtil.exportByteArrayToFile(pbe.getAbsolutePath(),
-							PBEncryption.encryptPBKDF2WithHmacSHA256(pbe));
-					mainApp.setPBEFilePath(pbe);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				File pbe = new File("PBE");
+				FileUtil.exportByteArrayToFile(pbe.getAbsolutePath(),
+						PBEncryption.encryptPBKDF2WithHmacSHA256(EncryptionUtil.generateSalt(256)));
+				mainApp.setPBEFilePath(pbe);
 				mainApp.showView();
 			}
 

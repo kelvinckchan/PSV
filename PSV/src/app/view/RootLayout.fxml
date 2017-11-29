@@ -9,15 +9,22 @@
    <top>
       <MenuBar prefHeight="15.0" BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu mnemonicParsing="false" text="User-Info">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#handleNew" text="New" />
                   <MenuItem mnemonicParsing="false" onAction="#handleReadUserInfo" text="Read User Info" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Save" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleSaveUserInfo" text="Save User Info" />
                   <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Save As" />
                   <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Close" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="Sym Key">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleNew" text="New" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleReadSymKey" text="Read Sym Key" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleSaveSymKey" text="Save Sym Key" />
+               </items>
+            </Menu>
         </menus>
       </MenuBar>
    </top>

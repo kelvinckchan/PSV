@@ -23,6 +23,10 @@ public class SymmetricKey {
 
 	}
 
+	public SymmetricKey(String keyName, String keyInfo) {
+		this(keyName, keyInfo, null);
+	}
+
 	public StringProperty keyNameProperty() {
 		return keyName;
 	}

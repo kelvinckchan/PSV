@@ -17,7 +17,7 @@ import javafx.beans.property.StringProperty;
  *
  * @author Marco Jakob
  */
-public class Model {
+public class UserInfo {
 
 	private final StringProperty accountName;
 	private final StringProperty userID;
@@ -27,7 +27,7 @@ public class Model {
 	/**
 	 * Default constructor.
 	 */
-	public Model() {
+	public UserInfo() {
 		this(null, null);
 	}
 
@@ -37,7 +37,7 @@ public class Model {
 	 * @param accountName
 	 * @param userID
 	 */
-	public Model(String accountName, String userID) {
+	public UserInfo(String accountName, String userID) {
 		this.accountName = new SimpleStringProperty(accountName);
 		this.userID = new SimpleStringProperty(userID);
 		this.password = new SimpleStringProperty("password");

@@ -83,20 +83,20 @@ public class AsymmetricEncryption {
 			// String path = filePath.toAbsolutePath().toString();
 			// String sigPath = path.replace(path.substring(path.lastIndexOf(".")), ".sig");
 			// System.out.println("read sigPath> " + sigPath);
-			//
-			byte[] readdata = Files.readAllBytes(Paths.get("testStoreAsyKey.xml"));
-
-			String SigningMethod = "SHA1withRSA";
-			SigningMethod = "MD5withRSA";
 			
-			byte[] s = sign(readdata,SigningMethod, readkp.getPrivate());
-			System.out.println("dataByte> " + readdata);
-			System.out.println("Signed> " + s);
-			generateSigFile(s, Paths.get("testStoreAsyKey.xml"));
-			byte[] reads = readSigFile(Paths.get("testStoreAsyKey.sig"));
-			System.out.println("read Signed> " + reads);
-			boolean isCorrect = verify(readdata,SigningMethod, reads, readkp.getPublic());
-			System.out.println("Signature correct: " + isCorrect);
+//			byte[] readdata = Files.readAllBytes(Paths.get("testStoreAsyKey.xml"));
+//
+//			String SigningMethod = "SHA1withRSA";
+//			SigningMethod = "MD5withRSA";
+
+//			byte[] s = sign(readdata, SigningMethod, readkp.getPrivate());
+//			System.out.println("dataByte> " + readdata);
+//			System.out.println("Signed> " + s);
+//			generateSigFile(s, Paths.get("testStoreAsyKey.xml"));
+//			byte[] reads = readSigFile(Paths.get("testStoreAsyKey.sig"));
+//			System.out.println("read Signed> " + reads);
+//			boolean isCorrect = verify(readdata, SigningMethod, reads, readkp.getPublic());
+//			System.out.println("Signature correct: " + isCorrect);
 
 			// testENDE(dataByte, readpub, readpri);
 			// testENDE(dataByte, readpri, readpub);
@@ -121,23 +121,17 @@ public class AsymmetricEncryption {
 			// AsymmetricKey().setKeyName("PrivateKey3").setKeyInfo("RSA1024PrivateKey")
 			// .setPrivateKey(generateKeyPair(1024).getPrivate()));
 
-			// asymmetricKeys
-			// .add(new
-			// AsymmetricKey().setKeyName("k2").setKeyInfo("RSA4096").setKeyPair(generateKeyPair(4096)));
-			// asymmetricKeys
-			// .add(new
-			// AsymmetricKey().setKeyName("k3").setKeyInfo("RSA1024").setKeyPair(generateKeyPair(1024)));
-			// asymmetricKeys
-			// .add(new
-			// AsymmetricKey().setKeyName("k4").setKeyInfo("RSA2048").setKeyPair(generateKeyPair(2048)));
+			asymmetricKeys.add(new AsymmetricKey("k2", "RSA4096").setKeyPair(generateKeyPair(4096)));
+			asymmetricKeys.add(new AsymmetricKey("k3", "RSA1024").setKeyPair(generateKeyPair(1024)));
+			asymmetricKeys.add(new AsymmetricKey("kd", "RSA2048").setKeyPair(generateKeyPair(2048)));
 
-//			printList();
+			printList();
 
-			// PublicKey ip = asymmetricKeys.get(0).getKeyPair().getPublic();
-			// saveAsymmetricKeyToFile(new File("testStoreAsyKey.xml"));
-			// loadAsymmetricKeyFromFile(new File("testStoreAsyKey.xml"));
+			PublicKey ip = asymmetricKeys.get(0).getKeyPair().getPublic();
+			saveAsymmetricKeyToFile(new File("testStoreAsyKey.xml"));
+			loadAsymmetricKeyFromFile(new File("testStoreAsyKey.xml"));
 
-//			printList();
+			printList();
 
 			// testENDE(dataByte, ip, asymmetricKeys.get(0).getKeyPair().getPrivate());
 
@@ -223,7 +217,7 @@ public class AsymmetricEncryption {
 		Files.write(Paths.get(checkSumPath), getCheckSum(mode, Files.readAllBytes(file.toPath())));
 	}
 
-	// 
+	//
 	public void generateDigitalSignatureFile(byte[] data, String HashMode, String method, PrivateKey privateKey,
 			String path) {
 		try {

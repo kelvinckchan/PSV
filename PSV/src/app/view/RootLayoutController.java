@@ -34,7 +34,7 @@ public class RootLayoutController {
 	 */
 	@FXML
 	private void handleNew() {
-		mainApp.getModelData().clear();
+		mainApp.getUserInfoData().clear();
 		mainApp.setModelFilePath(null);
 	}
 
@@ -52,7 +52,7 @@ public class RootLayoutController {
 		// Show open file dialog
 		File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
 		if (file != null) {
-			mainApp.loadModelDataFromFile(file);
+			mainApp.loadUserInfoFromFile(file);
 		}
 	}
 
@@ -61,12 +61,45 @@ public class RootLayoutController {
 	 * file, the "save as" dialog is shown.
 	 */
 	@FXML
-	private void handleSave() {
+	private void handleSaveUserInfo() {
 		File modelFile = mainApp.getModelFilePath();
 		if (modelFile != null) {
-			mainApp.saveModelDataToFile(modelFile);
+			mainApp.saveUserInfoToFile(modelFile);
 		} else {
 			handleSaveAs();
+		}
+	}
+	@FXML
+	private void handleReadSymKey() {
+		FileChooser fileChooser = new FileChooser();
+
+		// Set extension filter
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		fileChooser.getExtensionFilters().add(extFilter);
+
+		// Show open file dialog
+		File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+		if (file != null) {
+			mainApp.loadSymKeyFromFile(file);
+		}
+	}
+	@FXML
+	private void handleSaveSymKey() {
+		FileChooser fileChooser = new FileChooser();
+
+		// Set extension filter
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		fileChooser.getExtensionFilters().add(extFilter);
+
+		// Show save file dialog
+		File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+
+		if (file != null) {
+			// Make sure it has the correct extension
+			if (!file.getPath().endsWith(".xml")) {
+				file = new File(file.getPath() + ".xml");
+			}
+			mainApp.saveUserInfoToFile(file);
 		}
 	}
 
@@ -89,10 +122,9 @@ public class RootLayoutController {
 			if (!file.getPath().endsWith(".xml")) {
 				file = new File(file.getPath() + ".xml");
 			}
-			mainApp.saveModelDataToFile(file);
+			mainApp.saveUserInfoToFile(file);
 		}
 	}
-
 
 	/**
 	 * Closes the application.

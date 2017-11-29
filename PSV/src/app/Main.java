@@ -12,10 +12,14 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import TestCode.FileUtil;
-import app.model.Model;
-import app.model.ModelWrapper;
+import app.model.AsymmetricKey;
+import app.model.SymmetricKey;
+import app.model.SymmetricKeyWrapper;
+import app.model.UserInfo;
+import app.model.UserInfoWrapper;
 import app.util.PBEncryption;
-import app.view.EditDialogController;
+import app.view.UserInfoEditDialogController;
+import app.view.SymKeyEditDialogController;
 import app.view.LoginController;
 import app.view.RootLayoutController;
 import app.view.TabpanelController;
@@ -112,30 +116,30 @@ public class Main extends Application {
 	 * OK, the changes are saved into the provided model object and true is
 	 * returned.
 	 * 
-	 * @param model
+	 * @param userInfo
 	 *            the model object to be edited
 	 * @return true if the user clicked OK, false otherwise.
 	 */
-	public boolean showModelEditDialog(Model model) {
+	public boolean showModelEditDialog(UserInfo userInfo) {
 		try {
 			// Load the fxml file and create a new stage for the popup dialog.
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Main.class.getResource("view/EditDialog.fxml"));
+			loader.setLocation(Main.class.getResource("view/UserInfoEditDialog.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
 
 			// Create the dialog Stage.
 			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Edit Model");
+			dialogStage.setTitle("Edit UserInfo");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(primaryStage);
 			Scene scene = new Scene(page);
-			scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
+			// scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
 			dialogStage.setScene(scene);
 
 			// Set the model into the controller.
-			EditDialogController controller = loader.getController();
+			UserInfoEditDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
-			controller.setModel(model);
+			controller.setModel(userInfo);
 
 			// Show the dialog and wait until the user closes it
 			dialogStage.showAndWait();
@@ -147,13 +151,37 @@ public class Main extends Application {
 		}
 	}
 
-	/**
-	 * Returns the model file preference, i.e. the file that was last opened. The
-	 * preference is read from the OS specific registry. If no such preference can
-	 * be found, null is returned.
-	 * 
-	 * @return
-	 */
+	public boolean showKeyEditDialog(SymmetricKey selectedKey) {
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("view/SymKeyEditDialog.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+
+			// Create the dialog Stage.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Edit Sym Key");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(page);
+			scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
+			dialogStage.setScene(scene);
+
+			// Set the model into the controller.
+			SymKeyEditDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setModel(selectedKey);
+
+			// Show the dialog and wait until the user closes it
+			dialogStage.showAndWait();
+
+			return controller.isOkClicked();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	public File getPBEFilePath() {
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		String filePath = prefs.get("PBEPath", null);
@@ -188,18 +216,18 @@ public class Main extends Application {
 	 * 
 	 * @param file
 	 */
-	public void loadModelDataFromFile(File file) {
+	public void loadUserInfoFromFile(File file) {
 		try {
-			
-			ByteArrayInputStream in = new ByteArrayInputStream(	PBEncryption.decryptPBKDF2WithHmacSHA256(file));
-			JAXBContext context = JAXBContext.newInstance(ModelWrapper.class);
+
+			ByteArrayInputStream in = new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file));
+			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
 
 			// Reading XML from the file and unmarshalling.
-			ModelWrapper wrapper = (ModelWrapper) um.unmarshal(in);
+			UserInfoWrapper wrapper = (UserInfoWrapper) um.unmarshal(in);
 
-			modelData.clear();
-			modelData.addAll(wrapper.getModels());
+			userInfoData.clear();
+			userInfoData.addAll(wrapper.getUserInfos());
 
 			// Save the file path to the registry.
 			setModelFilePath(file);
@@ -213,25 +241,67 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
-
-	/**
-	 * Saves the current model data to the specified file.
-	 * 
-	 * @param file
-	 */
-	public void saveModelDataToFile(File file) {
+	public void loadSymKeyFromFile(File file) {
 		try {
-			JAXBContext context = JAXBContext.newInstance(ModelWrapper.class);
+
+			ByteArrayInputStream in = new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file));
+			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
+			Unmarshaller um = context.createUnmarshaller();
+
+			// Reading XML from the file and unmarshalling.
+			SymmetricKeyWrapper wrapper = (SymmetricKeyWrapper) um.unmarshal(in);
+
+			symmetricKeyData.clear();
+			symmetricKeyData.addAll(wrapper.getSymmetricKeys());
+
+			// Save the file path to the registry.
+			setModelFilePath(file);
+
+		} catch (Exception e) { // catches ANY exception
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Could not load data");
+			alert.setContentText("Could not load data from file:\n" + file.getPath());
+
+			alert.showAndWait();
+		}
+	}
+	public void saveSymKeyToFile(File file) {
+		try {
+			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			ModelWrapper wrapper = new ModelWrapper();
-			wrapper.setModels(modelData);
-			 ByteArrayOutputStream out = new ByteArrayOutputStream();
+			SymmetricKeyWrapper wrapper = new SymmetricKeyWrapper();
+			wrapper.setSymmetricKeys(symmetricKeyData);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			m.marshal(wrapper, out);
-			
-			FileUtil.exportByteArrayToFile(file.getAbsolutePath(), PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
-			
-			
+
+			FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
+					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
+
+			setModelFilePath(file);
+		} catch (Exception e) { // catches ANY exception
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Could not save data");
+			alert.setContentText("Could not save data to file:\n" + file.getPath());
+			alert.showAndWait();
+		}
+	}
+
+	public void saveUserInfoToFile(File file) {
+		try {
+			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
+			Marshaller m = context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			UserInfoWrapper wrapper = new UserInfoWrapper();
+			wrapper.setUserInfos(userInfoData);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			m.marshal(wrapper, out);
+
+			FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
+					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
+
 			setModelFilePath(file);
 		} catch (Exception e) { // catches ANY exception
 			Alert alert = new Alert(AlertType.ERROR);
@@ -245,15 +315,20 @@ public class Main extends Application {
 	/**
 	 * The data as an observable list of Persons.
 	 */
-	private ObservableList<Model> modelData = FXCollections.observableArrayList();
+	private ObservableList<UserInfo> userInfoData = FXCollections.observableArrayList();
+	private ObservableList<SymmetricKey> symmetricKeyData = FXCollections.observableArrayList();
+	private ObservableList<AsymmetricKey> asymmetricKeyData = FXCollections.observableArrayList();
 
-	/**
-	 * Returns the data as an observable list of Persons.
-	 * 
-	 * @return
-	 */
-	public ObservableList<Model> getModelData() {
-		return modelData;
+	public ObservableList<UserInfo> getUserInfoData() {
+		return userInfoData;
+	}
+
+	public ObservableList<SymmetricKey> getSymmetricKeyData() {
+		return symmetricKeyData;
+	}
+
+	public ObservableList<AsymmetricKey> getAsymmetricKeyData() {
+		return asymmetricKeyData;
 	}
 
 	/**

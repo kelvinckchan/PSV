@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="371.0" prefWidth="566.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.EditDialogController">
+<AnchorPane id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="371.0" prefWidth="566.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.UserInfoEditDialogController">
 	<children>
 		<GridPane alignment="CENTER" layoutX="27.6" layoutY="29.6" prefHeight="257.0" prefWidth="526.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 			<children>

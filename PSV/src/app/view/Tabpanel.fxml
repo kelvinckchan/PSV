@@ -12,7 +12,7 @@
       <TabPane fx:id="tabPane" prefHeight="315.0" prefWidth="532.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab fx:id="userInfoTab" text="User Info" />
-          <Tab text="Untitled Tab 2" />
+          <Tab fx:id="symTab" text="Sym" />
         </tabs>
       </TabPane>
    </children>

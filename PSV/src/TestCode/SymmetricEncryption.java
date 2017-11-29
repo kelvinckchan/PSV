@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import app.model.ModelWrapper;
+import app.model.UserInfoWrapper;
 import app.model.SymmetricKey;
 import app.model.SymmetricKeyWrapper;
 import javafx.scene.control.Alert;
@@ -198,7 +198,7 @@ public class SymmetricEncryption {
 		}
 	}
 
-	public SecretKey generateSymKey(String method, int keysize) {
+	public static SecretKey generateSymKey(String method, int keysize) {
 		try {
 			KeyGenerator keygenerator = KeyGenerator.getInstance(method);
 			keygenerator.init(keysize);
