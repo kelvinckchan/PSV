@@ -30,6 +30,7 @@ import javax.crypto.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import org.junit.jupiter.api.Test;
 
@@ -44,11 +45,10 @@ public class AsymmetricEncryption {
 		System.err.println("AAsymmetricEncryption Done");
 	}
 
-	KeyPair kp;
-	PublicKey publicKey;
-	PrivateKey privateKey;
-
 	private void run() {
+		KeyPair kp;
+		PublicKey publicKey;
+		PrivateKey privateKey;
 		System.out.println("AAsymmetricEncryption");
 		String data = "#¤Ï¤¤This is the secret data need to Encrypt?";
 		// 1024/2048/4096-bit RSA key
@@ -86,13 +86,16 @@ public class AsymmetricEncryption {
 			//
 			byte[] readdata = Files.readAllBytes(Paths.get("testStoreAsyKey.xml"));
 
-			byte[] s = sign(readdata, readkp.getPrivate());
+			String SigningMethod = "SHA1withRSA";
+			SigningMethod = "MD5withRSA";
+			
+			byte[] s = sign(readdata,SigningMethod, readkp.getPrivate());
 			System.out.println("dataByte> " + readdata);
 			System.out.println("Signed> " + s);
 			generateSigFile(s, Paths.get("testStoreAsyKey.xml"));
 			byte[] reads = readSigFile(Paths.get("testStoreAsyKey.sig"));
 			System.out.println("read Signed> " + reads);
-			boolean isCorrect = verify(readdata, reads, readkp.getPublic());
+			boolean isCorrect = verify(readdata,SigningMethod, reads, readkp.getPublic());
 			System.out.println("Signature correct: " + isCorrect);
 
 			// testENDE(dataByte, readpub, readpri);
@@ -128,13 +131,13 @@ public class AsymmetricEncryption {
 			// .add(new
 			// AsymmetricKey().setKeyName("k4").setKeyInfo("RSA2048").setKeyPair(generateKeyPair(2048)));
 
-			printList();
+//			printList();
 
 			// PublicKey ip = asymmetricKeys.get(0).getKeyPair().getPublic();
 			// saveAsymmetricKeyToFile(new File("testStoreAsyKey.xml"));
 			// loadAsymmetricKeyFromFile(new File("testStoreAsyKey.xml"));
 
-			printList();
+//			printList();
 
 			// testENDE(dataByte, ip, asymmetricKeys.get(0).getKeyPair().getPrivate());
 
@@ -143,6 +146,15 @@ public class AsymmetricEncryption {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void testENDE(byte[] dataByte, Key enKey, Key deKey) throws UnsupportedEncodingException {
+		byte[] en = rsaEncrypt(dataByte, enKey);
+		byte[] de = rsaDecrypt(en, deKey);
+		System.out.println("en> " + en + "\nde> " + new String(de, "UTF-8"));
+		System.out.println("---------------------------------------------------------------------------");
+		assertEquals(new String(dataByte, "UTF-8"), new String(de, "UTF-8"));
 	}
 
 	public void printList() {
@@ -187,13 +199,57 @@ public class AsymmetricEncryption {
 		}
 	}
 
-	@Test
-	public void testENDE(byte[] dataByte, Key enKey, Key deKey) throws UnsupportedEncodingException {
-		byte[] en = rsaEncrypt(dataByte, enKey);
-		byte[] de = rsaDecrypt(en, deKey);
-		System.out.println("en> " + en + "\nde> " + new String(de, "UTF-8"));
-		System.out.println("---------------------------------------------------------------------------");
-		assertEquals(new String(dataByte, "UTF-8"), new String(de, "UTF-8"));
+	public boolean verifyCheckSum(String mode, File file) throws IOException {
+		String format = "";
+		if (mode.equals("MD5")) {
+			format = ".md5";
+		} else if (mode.equals("SHA-1")) {
+			format = ".sha1";
+		}
+		String existCheckSumPath = FileUtil.changeExtension(file.getAbsolutePath(), format);
+		String newCheckSum = new HexBinaryAdapter().marshal(getCheckSum(mode, Files.readAllBytes(file.toPath())));
+		String existCheckSum = new HexBinaryAdapter().marshal(Files.readAllBytes(Paths.get(existCheckSumPath)));
+		return newCheckSum.equals(existCheckSum);
+	}
+
+	public void generateCheckSun(String mode, File file) throws IOException {
+		String format = "";
+		if (mode.equals("MD5")) {
+			format = ".md5";
+		} else if (mode.equals("SHA-1")) {
+			format = ".sha1";
+		}
+		String checkSumPath = FileUtil.changeExtension(file.getAbsolutePath(), format);
+		Files.write(Paths.get(checkSumPath), getCheckSum(mode, Files.readAllBytes(file.toPath())));
+	}
+
+	// 
+	public void generateDigitalSignatureFile(byte[] data, String HashMode, String method, PrivateKey privateKey,
+			String path) {
+		try {
+			byte[] HashValue = getCheckSum(HashMode, data);
+			byte[] SignedValue = sign(HashValue, method, privateKey);
+			FileUtil.exportByteArrayToFile(path, SignedValue);
+
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean verifyDigitalSignatureFile(String path, PublicKey publicKey) {
+
+		return false;
+	}
+
+	public byte[] getCheckSum(String mode, byte[] data) {
+		try {
+			MessageDigest md = MessageDigest.getInstance(mode);
+			md.update(data);
+			return md.digest();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public byte[] storeKeyPairToByteArray(KeyPair kp) throws IOException {
@@ -202,7 +258,7 @@ public class AsymmetricEncryption {
 		o.writeObject(kp);
 		byte[] kpb = b.toByteArray();
 
-//		Files.write(new File("KeyPair.key").toPath(), kpb);
+		// Files.write(new File("KeyPair.key").toPath(), kpb);
 		return kpb;
 	}
 
@@ -247,9 +303,9 @@ public class AsymmetricEncryption {
 		return new String(decriptCipher.doFinal(bytes), "UTF-8");
 	}
 
-	public static byte[] sign(byte[] data, PrivateKey privateKey) throws InvalidKeyException {
+	public static byte[] sign(byte[] data, String method, PrivateKey privateKey) throws InvalidKeyException {
 		try {
-			Signature privateSignature = Signature.getInstance("SHA256withRSA");
+			Signature privateSignature = Signature.getInstance(method);
 			privateSignature.initSign(privateKey);
 			privateSignature.update(data);
 			return privateSignature.sign();
@@ -264,7 +320,7 @@ public class AsymmetricEncryption {
 	public void generateSigFile(byte[] sign, Path filePath) {
 		String path = filePath.toAbsolutePath().toString();
 		String sigPath = path.replace(path.substring(path.lastIndexOf(".")), ".sig");
-		FileUtil.exportFileAsByteArray(sigPath, sign);
+		FileUtil.exportByteArrayToFile(sigPath, sign);
 	}
 
 	public byte[] readSigFile(Path filePath) {
@@ -278,13 +334,13 @@ public class AsymmetricEncryption {
 		// e.printStackTrace();
 		// }
 		// return null;
-		return FileUtil.importFileAsByteArray(filePath.toAbsolutePath().toString());
+		return FileUtil.importByteArrayFromFile(filePath.toAbsolutePath().toString());
 	}
 
-	public static boolean verify(byte[] data, byte[] signature, PublicKey publicKey)
+	public static boolean verify(byte[] data, String method, byte[] signature, PublicKey publicKey)
 			throws InvalidKeyException, SignatureException {
 		try {
-			Signature publicSignature = Signature.getInstance("SHA256withRSA");
+			Signature publicSignature = Signature.getInstance(method);
 			publicSignature.initVerify(publicKey);
 			publicSignature.update(data);
 			return publicSignature.verify(signature);

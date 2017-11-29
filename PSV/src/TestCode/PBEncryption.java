@@ -48,9 +48,9 @@ public class PBEncryption {
 				password.toCharArray(), salt3DES, noIterations);
 		System.out.println("encryptPBEWithMD5AndTripleDES> " + encryptPBEWithMD5AndTripleDESData);
 
-		FileUtil.exportFileAsByteArray(Paths.get("encryptPBEWithMD5AndTripleDESData.xml").toAbsolutePath().toString(),
+		FileUtil.exportByteArrayToFile(Paths.get("encryptPBEWithMD5AndTripleDESData.xml").toAbsolutePath().toString(),
 				encryptPBEWithMD5AndTripleDESData);
-		byte[] in = FileUtil.importFileAsByteArray("encryptPBEWithMD5AndTripleDESData.xml");
+		byte[] in = FileUtil.importByteArrayFromFile("encryptPBEWithMD5AndTripleDESData.xml");
 
 		byte[] decryptedData0 = decryptPBEWithMD5AndTripleDES(in, password.toCharArray(), noIterations);
 		System.out.println("decryptPBKDF2WithHmacSHA256> " + new String(decryptedData0));
