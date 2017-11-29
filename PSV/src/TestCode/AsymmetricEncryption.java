@@ -202,13 +202,7 @@ public class AsymmetricEncryption {
 		o.writeObject(kp);
 		byte[] kpb = b.toByteArray();
 
-		Files.write(new File("KeyPair.key").toPath(), kpb);
-
-		// ObjectOutputStream oout = new ObjectOutputStream(new BufferedOutputStream(new
-		// FileOutputStream("KeyPair.key")));
-		// oout.write(kpb);
-		//// oout.writeObject(kp);
-		// oout.flush();
+//		Files.write(new File("KeyPair.key").toPath(), kpb);
 		return kpb;
 	}
 
@@ -378,29 +372,4 @@ public class AsymmetricEncryption {
 		return null;
 	}
 
-	// public byte[] rsaEncrypt(byte[] data, Key key) {
-	// try {
-	// Cipher cipher = Cipher.getInstance("RSA");
-	// cipher.init(Cipher.ENCRYPT_MODE, key);
-	// return cipher.doFinal(data);
-	// } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-	// e.printStackTrace();
-	// } catch (InvalidKeyException e) {
-	// e.printStackTrace();
-	// } catch (IllegalBlockSizeException e) {
-	// e.printStackTrace();
-	// } catch (BadPaddingException e) {
-	// e.printStackTrace();
-	// }
-	// return null;
-	// }
-
-	// public byte[] rsaDecrypt(byte[] data, Key key)
-	// throws IllegalBlockSizeException, BadPaddingException,
-	// InvalidKeySpecException, NoSuchAlgorithmException,
-	// IOException, NoSuchPaddingException, InvalidKeyException {
-	// Cipher cipher = Cipher.getInstance("RSA");
-	// cipher.init(Cipher.DECRYPT_MODE, key);
-	// return cipher.doFinal(data);
-	// }
 }

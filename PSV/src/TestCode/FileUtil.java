@@ -25,4 +25,12 @@ public class FileUtil {
 			e.printStackTrace();
 		}
 	}
+
+	public static String changeExtension(String filePath, String format) {
+		if (filePath.lastIndexOf(".") != -1) {
+			return filePath.replace(filePath.substring(filePath.lastIndexOf(".")), format);
+		}
+		return filePath + format;
+	}
+
 }

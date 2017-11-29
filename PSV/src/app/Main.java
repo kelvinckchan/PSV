@@ -8,8 +8,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import Checksum.MD5CheckSum;
-import Checksum.SHA1CheckSum;
 import app.model.Model;
 import app.model.ModelWrapper;
 import app.view.EditDialogController;
@@ -35,22 +33,8 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("The App");
-
-		/* 
-		 * 
-		 *  Here is two checksum method, one is MD5, another one is SHA-1
-		 *  You can check the difference if you modified the TestCheckSum txt file.
-		 *  http://www.sha1-online.com/ <- Here can test the hash value correct or not
-		 *  
-		 */
-		MD5CheckSum check = new MD5CheckSum();
-		check.start();
-
-		SHA1CheckSum check1 = new SHA1CheckSum();
-		check1.start();
-
-		// initRootLayout();
-		// showView();
+		 initRootLayout();
+		 showView();
 	}
 
 	/**
