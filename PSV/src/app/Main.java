@@ -2,6 +2,7 @@ package app;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Security;
 import java.util.prefs.Preferences;
 
 import javax.xml.bind.JAXBContext;
@@ -11,6 +12,7 @@ import javax.xml.bind.Unmarshaller;
 import app.model.Model;
 import app.model.ModelWrapper;
 import app.view.EditDialogController;
+import app.view.LoginController;
 import app.view.RootLayoutController;
 import app.view.ViewController;
 import javafx.application.Application;
@@ -33,8 +35,9 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("The App");
-		 initRootLayout();
-		 showView();
+		initRootLayout();
+		// showView();
+		showLogin();
 	}
 
 	/**
@@ -59,17 +62,28 @@ public class Main extends Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// Try to load last opened person file.
-		File file = getModelFilePath();
-		if (file != null) {
-			loadModelDataFromFile(file);
+
+	}
+
+	public void showLogin() {
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("view/Login.fxml"));
+			AnchorPane loginPane = (AnchorPane) loader.load();
+			rootLayout.setCenter(loginPane);
+			LoginController controller = loader.getController();
+			controller.setMainApp(this);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	/**
 	 * Shows the model overview inside the root layout.
 	 */
 	public void showView() {
+
 		try {
 			// Load model overview.
 			FXMLLoader loader = new FXMLLoader();
@@ -97,7 +111,7 @@ public class Main extends Application {
 	 *            the model object to be edited
 	 * @return true if the user clicked OK, false otherwise.
 	 */
-	public boolean showPersonEditDialog(Model model) {
+	public boolean showModelEditDialog(Model model) {
 		try {
 			// Load the fxml file and create a new stage for the popup dialog.
 			FXMLLoader loader = new FXMLLoader();
@@ -135,9 +149,9 @@ public class Main extends Application {
 	 * 
 	 * @return
 	 */
-	public File getModelFilePath() {
+	public File getPBEFilePath() {
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
-		String filePath = prefs.get("filePath", null);
+		String filePath = prefs.get("PBEPath", null);
 		if (filePath != null) {
 			return new File(filePath);
 		} else {
@@ -152,18 +166,14 @@ public class Main extends Application {
 	 * @param file
 	 *            the file or null to remove the path
 	 */
-	public void setModelFilePath(File file) {
+	public void setPBEFilePath(File file) {
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		if (file != null) {
-			prefs.put("filePath", file.getPath());
-
-			// Update the stage title.
-			primaryStage.setTitle("AddressApp - " + file.getName());
+			prefs.put("PBEPath", file.getPath());
+			primaryStage.setTitle("PSV - Encrypted");
 		} else {
-			prefs.remove("filePath");
-
-			// Update the stage title.
-			primaryStage.setTitle("AddressApp");
+			prefs.remove("PBEPath");
+			primaryStage.setTitle("PSV");
 		}
 	}
 
@@ -251,6 +261,7 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
+		Security.setProperty("crypto.policy", "unlimited");
 		launch(args);
 	}
 
@@ -258,11 +269,28 @@ public class Main extends Application {
 	 * Constructor
 	 */
 	public Main() {
-		// Add some sample data
-		modelData.add(new Model("Hans", "Muster"));
-		modelData.add(new Model("Ruth", "Mueller"));
-		modelData.add(new Model("Heinz", "Kurz"));
-		modelData.add(new Model("Cornelia", "Meier"));
+		// modelData.add(new Model("AccountName", "UserID"));
+	}
+
+	public void setModelFilePath(File file) {
+		Preferences prefs = Preferences.userNodeForPackage(Main.class);
+		if (file != null) {
+			prefs.put("filePath", file.getPath());
+			primaryStage.setTitle("PSV - " + file.getName());
+		} else {
+			prefs.remove("filePath");
+			primaryStage.setTitle("PSV");
+		}
+	}
+
+	public File getModelFilePath() {
+		Preferences prefs = Preferences.userNodeForPackage(Main.class);
+		String filePath = prefs.get("filePath", null);
+		if (filePath != null) {
+			return new File(filePath);
+		} else {
+			return null;
+		}
 	}
 
 }

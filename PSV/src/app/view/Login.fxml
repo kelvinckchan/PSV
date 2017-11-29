@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane id="anchor" prefHeight="315.0" prefWidth="532.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.LoginController">
+   <children>
+      <TextField fx:id="PBEpassword" layoutX="135.0" layoutY="125.0" prefHeight="25.0" prefWidth="264.0" AnchorPane.leftAnchor="135.0" AnchorPane.rightAnchor="133.0" AnchorPane.topAnchor="130.0" />
+      <Label layoutX="135.0" layoutY="94.0" text="Enter the Password for Password Base Encryption:" />
+      <Button layoutX="240.0" layoutY="175.0" mnemonicParsing="false" onAction="#handleSubmitPassword" text="Submit" AnchorPane.leftAnchor="135.0" />
+   </children>
+</AnchorPane>

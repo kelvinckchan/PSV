@@ -20,22 +20,20 @@ public class ViewController {
 	@FXML
 	private TableView<Model> ModelTable;
 	@FXML
-	private TableColumn<Model, String> firstNameColumn;
+	private TableColumn<Model, String> accountNameColumn;
 	@FXML
-	private TableColumn<Model, String> lastNameColumn;
+	private TableColumn<Model, String> userIDColumn;
 	@FXML
 	private ComboBox<String> testComboBox;
 
 	@FXML
-	private Label firstNameLabel;
+	private Label accountNameLabel;
 	@FXML
-	private Label lastNameLabel;
+	private Label userIDLabel;
 	@FXML
-	private Label streetLabel;
+	private Label passwordLabel;
 	@FXML
-	private Label postalCodeLabel;
-	@FXML
-	private Label cityLabel;
+	private Label remarksLabel;
 
 	// Reference to the main application.
 	private Main mainApp;
@@ -53,8 +51,8 @@ public class ViewController {
 	@FXML
 	private void initialize() {
 		// Initialize the Model table with the two columns.
-		firstNameColumn.setCellValueFactory(cellData -> cellData.getValue().firstNameProperty());
-		lastNameColumn.setCellValueFactory(cellData -> cellData.getValue().lastNameProperty());
+		accountNameColumn.setCellValueFactory(cellData -> cellData.getValue().accountNameProperty());
+		userIDColumn.setCellValueFactory(cellData -> cellData.getValue().userIDProperty());
 
 		testComboBox.setItems(comboBoxList);
 
@@ -88,21 +86,17 @@ public class ViewController {
 	private void showModelDetails(Model Model) {
 		if (Model != null) {
 			// Fill the labels with info from the Model object.
-			firstNameLabel.setText(Model.getFirstName());
-			lastNameLabel.setText(Model.getLastName());
-			streetLabel.setText(Model.getStreet());
-			postalCodeLabel.setText(Integer.toString(Model.getPostalCode()));
-			cityLabel.setText(Model.getCity());
-
-			// TODO: We need a way to convert the birthday into a String!
-			// birthdayLabel.setText(...);
+			accountNameLabel.setText(Model.getAccountName());
+			userIDLabel.setText(Model.getUserID());
+			passwordLabel.setText(Model.getPassword());
+			remarksLabel.setText( Model.getRemarks());
+			
 		} else {
 			// Model is null, remove all the text.
-			firstNameLabel.setText("");
-			lastNameLabel.setText("");
-			streetLabel.setText("");
-			postalCodeLabel.setText("");
-			cityLabel.setText("");
+			accountNameLabel.setText("");
+			userIDLabel.setText("");
+			passwordLabel.setText("");
+			remarksLabel.setText("");
 		}
 	}
 
@@ -128,7 +122,7 @@ public class ViewController {
 	@FXML
 	private void handleNewModel() {
 		Model tempModel = new Model();
-		boolean okClicked = mainApp.showPersonEditDialog(tempModel);
+		boolean okClicked = mainApp.showModelEditDialog(tempModel);
 		if (okClicked) {
 			mainApp.getModelData().add(tempModel);
 		}
@@ -142,7 +136,7 @@ public class ViewController {
 	private void handleEditModel() {
 		Model selectedModel = ModelTable.getSelectionModel().getSelectedItem();
 		if (selectedModel != null) {
-			boolean okClicked = mainApp.showPersonEditDialog(selectedModel);
+			boolean okClicked = mainApp.showModelEditDialog(selectedModel);
 			if (okClicked) {
 				showModelDetails(selectedModel);
 			}

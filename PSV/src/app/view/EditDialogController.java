@@ -16,17 +16,14 @@ import javafx.stage.Stage;
 public class EditDialogController {
 
 	@FXML
-	private TextField firstNameField;
+	private TextField accountNameField;
 	@FXML
-	private TextField lastNameField;
+	private TextField userIDField;
 	@FXML
-	private TextField streetField;
+	private TextField passwordField;
 	@FXML
-	private TextField postalCodeField;
-	@FXML
-	private TextField cityField;
-	@FXML
-	private TextField birthdayField;
+	private TextField remarksField;
+ 
 
 	private Stage dialogStage;
 	private Model Model;
@@ -56,14 +53,10 @@ public class EditDialogController {
 	 */
 	public void setModel(Model Model) {
 		this.Model = Model;
-
-		firstNameField.setText(Model.getFirstName());
-		lastNameField.setText(Model.getLastName());
-		streetField.setText(Model.getStreet());
-		postalCodeField.setText(Integer.toString(Model.getPostalCode()));
-		cityField.setText(Model.getCity());
-		birthdayField.setText(DateUtil.format(Model.getBirthday()));
-		birthdayField.setPromptText("dd.mm.yyyy");
+		accountNameField.setText(Model.getAccountName());
+		userIDField.setText(Model.getUserID());
+		passwordField.setText(Model.getPassword());
+		remarksField.setText(Model.getRemarks());
 	}
 
 	/**
@@ -81,12 +74,10 @@ public class EditDialogController {
 	@FXML
 	private void handleOk() {
 		if (isInputValid()) {
-			Model.setFirstName(firstNameField.getText());
-			Model.setLastName(lastNameField.getText());
-			Model.setStreet(streetField.getText());
-			Model.setPostalCode(Integer.parseInt(postalCodeField.getText()));
-			Model.setCity(cityField.getText());
-			Model.setBirthday(DateUtil.parse(birthdayField.getText()));
+			Model.setAccountName(accountNameField.getText());
+			Model.setUserID(userIDField.getText());
+			Model.setPassword(passwordField.getText());
+			Model.setRemarks(remarksField.getText());
 
 			okClicked = true;
 			dialogStage.close();
@@ -109,38 +100,31 @@ public class EditDialogController {
 	private boolean isInputValid() {
 		String errorMessage = "";
 
-		if (firstNameField.getText() == null || firstNameField.getText().length() == 0) {
+		if (accountNameField.getText() == null || accountNameField.getText().length() == 0) {
 			errorMessage += "No valid first name!\n";
 		}
-		if (lastNameField.getText() == null || lastNameField.getText().length() == 0) {
+		if (userIDField.getText() == null || userIDField.getText().length() == 0) {
 			errorMessage += "No valid last name!\n";
 		}
-		if (streetField.getText() == null || streetField.getText().length() == 0) {
-			errorMessage += "No valid street!\n";
+		if (passwordField.getText() == null || passwordField.getText().length() == 0) {
+			errorMessage += "No valid password!\n";
 		}
 
-		if (postalCodeField.getText() == null || postalCodeField.getText().length() == 0) {
-			errorMessage += "No valid postal code!\n";
-		} else {
-			// try to parse the postal code into an int.
-			try {
-				Integer.parseInt(postalCodeField.getText());
-			} catch (NumberFormatException e) {
-				errorMessage += "No valid postal code (must be an integer)!\n";
-			}
+//		if (postalCodeField.getText() == null || postalCodeField.getText().length() == 0) {
+//			errorMessage += "No valid postal code!\n";
+//		} else {
+//			// try to parse the postal code into an int.
+//			try {
+//				Integer.parseInt(postalCodeField.getText());
+//			} catch (NumberFormatException e) {
+//				errorMessage += "No valid postal code (must be an integer)!\n";
+//			}
+//		}
+
+		if (remarksField.getText() == null || remarksField.getText().length() == 0) {
+			errorMessage += "No valid remarks!\n";
 		}
 
-		if (cityField.getText() == null || cityField.getText().length() == 0) {
-			errorMessage += "No valid city!\n";
-		}
-
-		if (birthdayField.getText() == null || birthdayField.getText().length() == 0) {
-			errorMessage += "No valid birthday!\n";
-		} else {
-			if (!DateUtil.validDate(birthdayField.getText())) {
-				errorMessage += "No valid birthday. Use the format dd.mm.yyyy!\n";
-			}
-		}
 
 		if (errorMessage.length() == 0) {
 			return true;

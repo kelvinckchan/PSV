@@ -19,12 +19,10 @@ import javafx.beans.property.StringProperty;
  */
 public class Model {
 
-	private final StringProperty firstName;
-	private final StringProperty lastName;
-	private final StringProperty street;
-	private final IntegerProperty postalCode;
-	private final StringProperty city;
-	private final ObjectProperty<LocalDate> birthday;
+	private final StringProperty accountName;
+	private final StringProperty userID;
+	private final StringProperty password;
+	private final StringProperty remarks;
 
 	/**
 	 * Default constructor.
@@ -36,90 +34,62 @@ public class Model {
 	/**
 	 * Constructor with some initial data.
 	 * 
-	 * @param firstName
-	 * @param lastName
+	 * @param accountName
+	 * @param userID
 	 */
-	public Model(String firstName, String lastName) {
-		this.firstName = new SimpleStringProperty(firstName);
-		this.lastName = new SimpleStringProperty(lastName);
-
-		// Some initial dummy data, just for convenient testing.
-		this.street = new SimpleStringProperty("some street");
-		this.postalCode = new SimpleIntegerProperty(1234);
-		this.city = new SimpleStringProperty("some city");
-		this.birthday = new SimpleObjectProperty<LocalDate>(LocalDate.of(1999, 2, 21));
+	public Model(String accountName, String userID) {
+		this.accountName = new SimpleStringProperty(accountName);
+		this.userID = new SimpleStringProperty(userID);
+		this.password = new SimpleStringProperty("password");
+		this.remarks = new SimpleStringProperty("remarks");
 	}
 
-	public String getFirstName() {
-		return firstName.get();
+	public String getAccountName() {
+		return accountName.get();
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName.set(firstName);
+	public void setAccountName(String accountName) {
+		this.accountName.set(accountName);
 	}
 
-	public StringProperty firstNameProperty() {
-		return firstName;
+	public StringProperty accountNameProperty() {
+		return accountName;
 	}
 
-	public String getLastName() {
-		return lastName.get();
+	public String getUserID() {
+		return userID.get();
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName.set(lastName);
+	public void setUserID(String userID) {
+		this.userID.set(userID);
 	}
 
-	public StringProperty lastNameProperty() {
-		return lastName;
+	public StringProperty userIDProperty() {
+		return userID;
 	}
 
-	public String getStreet() {
-		return street.get();
+	public String getPassword() {
+		return password.get();
 	}
 
-	public void setStreet(String street) {
-		this.street.set(street);
+	public void setPassword(String password) {
+		this.password.set(password);
 	}
 
-	public StringProperty streetProperty() {
-		return street;
+	public StringProperty passwordProperty() {
+		return password;
 	}
 
-	public int getPostalCode() {
-		return postalCode.get();
+	public String getRemarks() {
+		return remarks.get();
 	}
 
-	public void setPostalCode(int postalCode) {
-		this.postalCode.set(postalCode);
+	public void setRemarks(String remarks) {
+		this.remarks.set(remarks);
 	}
 
-	public IntegerProperty postalCodeProperty() {
-		return postalCode;
+	public StringProperty remarksProperty() {
+		return remarks;
 	}
 
-	public String getCity() {
-		return city.get();
-	}
-
-	public void setCity(String city) {
-		this.city.set(city);
-	}
-
-	public StringProperty cityProperty() {
-		return city;
-	}
-
-	@XmlJavaTypeAdapter(LocalDateAdapter.class)
-	public LocalDate getBirthday() {
-		return birthday.get();
-	}
-
-	public void setBirthday(LocalDate birthday) {
-		this.birthday.set(birthday);
-	}
-
-	public ObjectProperty<LocalDate> birthdayProperty() {
-		return birthday;
-	}
 }

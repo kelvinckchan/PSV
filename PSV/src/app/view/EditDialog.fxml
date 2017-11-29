@@ -8,46 +8,34 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="371.0" prefWidth="566.0"   xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.EditDialogController">
+<AnchorPane id="anchor" minHeight="0.0" minWidth="0.0" prefHeight="371.0" prefWidth="566.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.EditDialogController">
 	<children>
-		<GridPane alignment="CENTER" layoutX="27.6" layoutY="29.6" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+		<GridPane alignment="CENTER" layoutX="27.6" layoutY="29.6" prefHeight="257.0" prefWidth="526.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 			<children>
-				<Label text="Label" GridPane.rowIndex="2">
+				<Label text="Password" GridPane.rowIndex="2">
 					<GridPane.margin>
 						<Insets left="10.0" />
 					</GridPane.margin>
 				</Label>
-				<Label layoutX="56.0" layoutY="17.0" text="Label" GridPane.rowIndex="1">
+				<Label layoutX="56.0" layoutY="17.0" text="UserID" GridPane.rowIndex="1">
 					<GridPane.margin>
 						<Insets left="10.0" />
 					</GridPane.margin>
 				</Label>
-				<Label text="Label" GridPane.rowIndex="4">
+				<Label text="Remarks" GridPane.rowIndex="3">
 					<GridPane.margin>
 						<Insets left="10.0" />
 					</GridPane.margin>
 				</Label>
-				<Label text="Label" GridPane.rowIndex="3">
+				<Label text="Account Name">
 					<GridPane.margin>
 						<Insets left="10.0" />
 					</GridPane.margin>
 				</Label>
-				<Label text="Label" GridPane.rowIndex="5">
-					<GridPane.margin>
-						<Insets left="10.0" />
-					</GridPane.margin>
-				</Label>
-				<Label text="Label">
-					<GridPane.margin>
-						<Insets left="10.0" />
-					</GridPane.margin>
-				</Label>
-				<TextField fx:id="firstNameField" GridPane.columnIndex="1" />
-				<TextField fx:id="lastNameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-				<TextField fx:id="birthdayField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-				<TextField fx:id="cityField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-				<TextField fx:id="postalCodeField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-				<TextField fx:id="streetField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+				<TextField fx:id="accountNameField" GridPane.columnIndex="1" />
+				<TextField fx:id="userIDField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+				<TextField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+				<TextField fx:id="remarksField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 			</children>
 			<columnConstraints>
 				<ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="202.0" />
@@ -58,18 +46,16 @@
 				<RowConstraints maxHeight="79.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
 				<RowConstraints maxHeight="62" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
 				<RowConstraints maxHeight="54.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
-				<RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="46.0" vgrow="SOMETIMES" />
-				<RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="46.0" vgrow="SOMETIMES" />
 			</rowConstraints>
 		</GridPane>
-		<HBox layoutX="428.0" layoutY="327.0" prefHeight="33.0" prefWidth="226.0" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="40.0">
+		<HBox layoutX="428.0" layoutY="327.0" prefHeight="25.0" prefWidth="209.0" AnchorPane.bottomAnchor="35.0" AnchorPane.rightAnchor="40.0">
 			<children>
-				<Button layoutX="432.0" layoutY="322.0" mnemonicParsing="false" onAction="#handleOk" prefHeight="33.0" prefWidth="91.0" text="OK">
+				<Button layoutX="432.0" layoutY="322.0" mnemonicParsing="false" onAction="#handleOk" prefHeight="25.0" prefWidth="90.0" text="OK">
 					<HBox.margin>
 						<Insets left="10.0" right="10.0" />
 					</HBox.margin>
 				</Button>
-				<Button layoutX="501.0" layoutY="322.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel">
+				<Button layoutX="501.0" layoutY="322.0" mnemonicParsing="false" onAction="#handleCancel" prefHeight="25.0" prefWidth="90.0" text="Cancel">
 					<HBox.margin>
 						<Insets left="10.0" right="10.0" />
 					</HBox.margin>

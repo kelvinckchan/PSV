@@ -1,5 +1,6 @@
 package TestCode;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,15 @@ public class FileUtil {
 		try {
 			Path fileLocation = Paths.get(path);
 			return Files.readAllBytes(fileLocation);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static byte[] importByteArrayFromFile(File file) {
+		try {
+			return Files.readAllBytes(Paths.get(file.getAbsolutePath()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
