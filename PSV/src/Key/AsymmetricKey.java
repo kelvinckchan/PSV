@@ -1,9 +1,13 @@
 package Key;
 
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -11,18 +15,22 @@ public class AsymmetricKey {
 
 	private StringProperty keyName;
 	private StringProperty keyInfo;
-	private StringProperty keyPairString;
+	private StringProperty Type;
 	private KeyPair keyPair;
-	
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
+
 	public AsymmetricKey() {
-		this(null, null, null);
+		this(null, null, null, null, null, null);
 	}
 
-	public AsymmetricKey(String keyName, String keyInfo, KeyPair keyPair) {
+	public AsymmetricKey(String keyName, String keyInfo,String Type, KeyPair keyPair, PublicKey publicKey, PrivateKey privateKey) {
 		this.keyName = new SimpleStringProperty(keyName);
 		this.keyInfo = new SimpleStringProperty(keyInfo);
-		this.keyPairString = new SimpleStringProperty(keyPair.toString());
 		this.keyPair = keyPair;
+		this.publicKey = publicKey;
+		this.privateKey = privateKey;
+		this.Type = new SimpleStringProperty(Type);
 	}
 
 	public StringProperty keyNameProperty() {
@@ -53,27 +61,53 @@ public class AsymmetricKey {
 		return this;
 	}
 
+	public StringProperty TypeProperty() {
+		return Type;
+	}
+
+	@XmlElement(name = "Type")
+	public String getType() {
+		return Type.get();
+	}
+
+	private void setType(String Type) {
+		this.Type.set(Type);
+	}
+
 	@XmlElement(name = "keyPair")
+	@XmlJavaTypeAdapter(AsymmetricKeyPairAdapter.class)
 	public KeyPair getKeyPair() {
 		return keyPair;
 	}
 
-	public void setKeyPair(KeyPair keyPair) {
+	public AsymmetricKey setKeyPair(KeyPair keyPair) {
 		this.keyPair = keyPair;
-		setKeyPairString(keyPair.toString());
+		this.setType("KeyPair");
+		return this;
 	}
 
-	public StringProperty keyPairStringProperty() {
-		return keyPairString;
+	@XmlElement(name = "publicKey")
+	@XmlJavaTypeAdapter(AsymmetricPublicKeyAdapter.class)
+	public PublicKey getPublicKey() {
+		return publicKey;
 	}
 
-	@XmlElement(name = "keyPairString")
-	public String getKeyPairString() {
-		return keyPairString.get();
+	public AsymmetricKey setPublicKey(PublicKey publicKey) {
+		this.publicKey = publicKey;
+		this.setType(this.privateKey == null ? "PublicKey" : "KeyPair");
+		return this;
 	}
 
-	private void setKeyPairString(String keyPairString) {
-		this.keyPairString.set(keyPairString);
+	@XmlElement(name = "privateKey")
+	@XmlJavaTypeAdapter(AsymmetricPrivateKeyAdapter.class)
+	public PrivateKey getPrivateKey() {
+		return privateKey;
+	}
+
+	public AsymmetricKey setPrivateKey(PrivateKey privateKey) {
+		this.privateKey = privateKey;
+		this.setType(this.publicKey == null ? "PrivateKey" : "KeyPair");
+		return this;
 	}
 
 }

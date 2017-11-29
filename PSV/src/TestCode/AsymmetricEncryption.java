@@ -6,6 +6,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,22 +15,33 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import javax.crypto.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.junit.jupiter.api.Test;
+
+import Key.AsymmetricKey;
+import Key.AsymmetricKeyWrapper;
 
 public class AsymmetricEncryption {
 
 	public static void main(String[] args) {
 		AsymmetricEncryption app = new AsymmetricEncryption();
 		app.run();
-		System.out.println("AsymmetricEncryption Done");
+		System.err.println("AAsymmetricEncryption Done");
 	}
 
 	KeyPair kp;
@@ -37,49 +49,148 @@ public class AsymmetricEncryption {
 	PrivateKey privateKey;
 
 	private void run() {
-		System.out.println("AsymmetricEncryption");
+		System.out.println("AAsymmetricEncryption");
 		String data = "#¤Ï¤¤This is the secret data need to Encrypt?";
-
+		// 1024/2048/4096-bit RSA key
 		kp = generateKeyPair(2048);
 		publicKey = kp.getPublic();
 		privateKey = kp.getPrivate();
-		System.out.println("publicKey> " + publicKey + "\nprivateKey> " + privateKey);
+		// System.out.println("publicKey> " + publicKey + "\nprivateKey> " +
+		// privateKey);
 
 		saveKeyPair(kp);
 		try {
 			PublicKey readpublicKey = (PublicKey) readKeyFromFile("public.key", "Public");
 			PrivateKey readprivateKey = (PrivateKey) readKeyFromFile("private.Key", "Private");
-			System.out.println("publicKey> " + readpublicKey + "\nprivateKey> " + readprivateKey);
+			// System.out.println("publicKey> " + readpublicKey + "\nprivateKey> " +
+			// readprivateKey);
 			byte[] dataByte = data.getBytes("UTF-8");
 
-			testENDE(dataByte, publicKey, privateKey);
-			testENDE(dataByte, publicKey, readprivateKey);
-			testENDE(dataByte, privateKey, publicKey);
-			testENDE(dataByte, privateKey, readpublicKey);
-			testENDE(dataByte, readpublicKey, readprivateKey);
-			testENDE(dataByte, readprivateKey, readpublicKey);
-			System.out.println("**********************************************************");
-
+			// testENDE(dataByte, publicKey, privateKey);
+			// testENDE(dataByte, publicKey, readprivateKey);
+			// testENDE(dataByte, privateKey, publicKey);
+			// testENDE(dataByte, privateKey, readpublicKey);
+			// testENDE(dataByte, readpublicKey, readprivateKey);
+			// testENDE(dataByte, readprivateKey, readpublicKey);
+			// System.out.println("**********************************************************");
+			//
+			System.out.println("kp> " + kp);
 			byte[] Storedkp = storeKeyPairToByteArray(kp);
 			KeyPair readkp = readKeyPairFromByteArray(Storedkp);
-			PublicKey readpub = readkp.getPublic();
-			PrivateKey readpri = readkp.getPrivate();
-			testENDE(dataByte, readpub, readpri);
-			testENDE(dataByte, readpri, readpub);
-			testENDE(dataByte, publicKey, readpri);
-			testENDE(dataByte, readpri, publicKey);
-			testENDE(dataByte, privateKey, readpub);
-			testENDE(dataByte, readpub, privateKey);
+			System.out.println("read kp> " + readkp);
+
+			// Path filePath = Paths.get("testStoreAsyKey.xml");
+			// String path = filePath.toAbsolutePath().toString();
+			// String sigPath = path.replace(path.substring(path.lastIndexOf(".")), ".sig");
+			// System.out.println("read sigPath> " + sigPath);
+			//
+			byte[] readdata = Files.readAllBytes(Paths.get("testStoreAsyKey.xml"));
+
+			byte[] s = sign(readdata, readkp.getPrivate());
+			System.out.println("dataByte> " + readdata);
+			System.out.println("Signed> " + s);
+			generateSigFile(s, Paths.get("testStoreAsyKey.xml"));
+			byte[] reads = readSigFile(Paths.get("testStoreAsyKey.sig"));
+			System.out.println("read Signed> " + reads);
+			boolean isCorrect = verify(readdata, reads, readkp.getPublic());
+			System.out.println("Signature correct: " + isCorrect);
+
+			// testENDE(dataByte, readpub, readpri);
+			// testENDE(dataByte, readpri, readpub);
+			// testENDE(dataByte, publicKey, readpri);
+			// testENDE(dataByte, readpri, publicKey);
+			// testENDE(dataByte, privateKey, readpub);
+			// testENDE(dataByte, readpub, privateKey);
+
+			// asymmetricKeys
+			// .add(new
+			// AsymmetricKey().setKeyName("KeyPair1").setKeyInfo("RSA2048").setKeyPair(generateKeyPair(2048)));
+
+			// KeyPair temp = generateKeyPair(2048);
+			// asymmetricKeys.add(new
+			// AsymmetricKey().setKeyName("KeyPair1").setKeyInfo("RSA2048KeyPair")
+			// .setPublicKey(temp.getPublic()).setPrivateKey(temp.getPrivate()));
+			//
+			// asymmetricKeys.add(new
+			// AsymmetricKey().setKeyName("PublicKey2").setKeyInfo("RSA2048PublicKey")
+			// .setPublicKey(generateKeyPair(2048).getPublic()));
+			// asymmetricKeys.add(new
+			// AsymmetricKey().setKeyName("PrivateKey3").setKeyInfo("RSA1024PrivateKey")
+			// .setPrivateKey(generateKeyPair(1024).getPrivate()));
+
+			// asymmetricKeys
+			// .add(new
+			// AsymmetricKey().setKeyName("k2").setKeyInfo("RSA4096").setKeyPair(generateKeyPair(4096)));
+			// asymmetricKeys
+			// .add(new
+			// AsymmetricKey().setKeyName("k3").setKeyInfo("RSA1024").setKeyPair(generateKeyPair(1024)));
+			// asymmetricKeys
+			// .add(new
+			// AsymmetricKey().setKeyName("k4").setKeyInfo("RSA2048").setKeyPair(generateKeyPair(2048)));
+
+			printList();
+
+			// PublicKey ip = asymmetricKeys.get(0).getKeyPair().getPublic();
+			// saveAsymmetricKeyToFile(new File("testStoreAsyKey.xml"));
+			// loadAsymmetricKeyFromFile(new File("testStoreAsyKey.xml"));
+
+			printList();
+
+			// testENDE(dataByte, ip, asymmetricKeys.get(0).getKeyPair().getPrivate());
 
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void printList() {
+		System.out.println("**********************************************************");
+		asymmetricKeys.forEach(k -> {
+			System.out.println(k.getKeyName() + "> " + k.getKeyInfo() + " > " + k.getType());
+			System.out.println("Pair > " + k.getKeyPair());
+			System.out.println("Pub > " + k.getPublicKey());
+			System.out.println("Pri > " + k.getPrivateKey());
+			System.out.println("^^^^^^");
+		});
+	}
+
+	List<AsymmetricKey> asymmetricKeys = new ArrayList<>();
+
+	public void saveAsymmetricKeyToFile(File file) {
+		try {
+			JAXBContext context = JAXBContext.newInstance(AsymmetricKeyWrapper.class);
+			Marshaller m = context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			AsymmetricKeyWrapper wrapper = new AsymmetricKeyWrapper();
+			wrapper.setAsymmetricKeys(asymmetricKeys);
+			m.marshal(wrapper, file);
+			// Save the file path to the registry.
+			// setModelFilePath(file);
+		} catch (Exception e) { // catches ANY exception
+			e.printStackTrace();
+		}
+	}
+
+	public void loadAsymmetricKeyFromFile(File file) {
+		try {
+			JAXBContext context = JAXBContext.newInstance(AsymmetricKeyWrapper.class);
+			Unmarshaller um = context.createUnmarshaller();
+			AsymmetricKeyWrapper wrapper = (AsymmetricKeyWrapper) um.unmarshal(file);
+			asymmetricKeys.clear();
+			asymmetricKeys.addAll(wrapper.getAsymmetricKeys());
+			// // Save the file path to the registry.
+			// setModelFilePath(file);
+		} catch (Exception e) { // catches ANY exception
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void testENDE(byte[] dataByte, Key pub, Key pri) throws UnsupportedEncodingException {
-		byte[] en = rsaEncrypt(dataByte, pub);
-		byte[] de = rsaDecrypt(en, pri);
+	public void testENDE(byte[] dataByte, Key enKey, Key deKey) throws UnsupportedEncodingException {
+		byte[] en = rsaEncrypt(dataByte, enKey);
+		byte[] de = rsaDecrypt(en, deKey);
 		System.out.println("en> " + en + "\nde> " + new String(de, "UTF-8"));
 		System.out.println("---------------------------------------------------------------------------");
 		assertEquals(new String(dataByte, "UTF-8"), new String(de, "UTF-8"));
@@ -89,14 +200,25 @@ public class AsymmetricEncryption {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
 		ObjectOutputStream o = new ObjectOutputStream(b);
 		o.writeObject(kp);
-		return b.toByteArray();
+		byte[] kpb = b.toByteArray();
+
+		Files.write(new File("KeyPair.key").toPath(), kpb);
+
+		// ObjectOutputStream oout = new ObjectOutputStream(new BufferedOutputStream(new
+		// FileOutputStream("KeyPair.key")));
+		// oout.write(kpb);
+		//// oout.writeObject(kp);
+		// oout.flush();
+		return kpb;
 	}
 
 	public KeyPair readKeyPairFromByteArray(byte[] kpb) throws IOException {
 		ByteArrayInputStream bi = new ByteArrayInputStream(kpb);
 		ObjectInputStream oi = new ObjectInputStream(bi);
 		try {
-			return (KeyPair) oi.readObject();
+			KeyPair kp = (KeyPair) oi.readObject();
+
+			return kp;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -131,33 +253,51 @@ public class AsymmetricEncryption {
 		return new String(decriptCipher.doFinal(bytes), "UTF-8");
 	}
 
-	public static String sign(String plainText, PrivateKey privateKey) throws Exception {
-		Signature privateSignature = Signature.getInstance("SHA256withRSA");
-		privateSignature.initSign(privateKey);
-		privateSignature.update(plainText.getBytes("UTF-8"));
-
-		byte[] signature = privateSignature.sign();
-
-		return Base64.getEncoder().encodeToString(signature);
+	public static byte[] sign(byte[] data, PrivateKey privateKey) throws InvalidKeyException {
+		try {
+			Signature privateSignature = Signature.getInstance("SHA256withRSA");
+			privateSignature.initSign(privateKey);
+			privateSignature.update(data);
+			return privateSignature.sign();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public static boolean verify(String plainText, String signature, PublicKey publicKey) throws Exception {
-		Signature publicSignature = Signature.getInstance("SHA256withRSA");
-		publicSignature.initVerify(publicKey);
-		publicSignature.update(plainText.getBytes("UTF-8"));
-
-		byte[] signatureBytes = Base64.getDecoder().decode(signature);
-
-		return publicSignature.verify(signatureBytes);
+	public void generateSigFile(byte[] sign, Path filePath) {
+		String path = filePath.toAbsolutePath().toString();
+		String sigPath = path.replace(path.substring(path.lastIndexOf(".")), ".sig");
+		FileUtil.exportFileAsByteArray(sigPath, sign);
 	}
 
-	// http://niels.nu/blog/2016/java-rsa.html
-	public void test() throws Exception {
-		KeyPair pair = generateKeyPair(2048);
-		String signature = sign("foobar", pair.getPrivate());
-		// Let's check the signature
-		boolean isCorrect = verify("foobar", signature, pair.getPublic());
-		System.out.println("Signature correct: " + isCorrect);
+	public byte[] readSigFile(Path filePath) {
+		// try {
+		// //read .sig with same name
+		//// String path = filePath.toAbsolutePath().toString();
+		//// String sigPath = path.replace(path.substring(path.lastIndexOf(".")),
+		// ".sig");
+		// return Files.readAllBytes(filePath);
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		// return null;
+		return FileUtil.importFileAsByteArray(filePath.toAbsolutePath().toString());
+	}
+
+	public static boolean verify(byte[] data, byte[] signature, PublicKey publicKey)
+			throws InvalidKeyException, SignatureException {
+		try {
+			Signature publicSignature = Signature.getInstance("SHA256withRSA");
+			publicSignature.initVerify(publicKey);
+			publicSignature.update(data);
+			return publicSignature.verify(signature);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
