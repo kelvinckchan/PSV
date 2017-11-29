@@ -22,7 +22,7 @@ public class SHA1CheckSum {
 		System.out.println("First Time: Press any key to continue");
 		input = in.nextLine();
 		callCheckSum();
-
+///
 		System.out.println("\nSecond Time: Modify the source file and press any key to continue");
 		input = in.nextLine();
 		callCheckSum();

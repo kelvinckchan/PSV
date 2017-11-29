@@ -37,6 +37,7 @@ public class Main extends Application {
 		this.primaryStage.setTitle("The App");
 
 		/* 
+		 * 
 		 *  Here is two checksum method, one is MD5, another one is SHA-1
 		 *  You can check the difference if you modified the TestCheckSum txt file.
 		 *  http://www.sha1-online.com/ <- Here can test the hash value correct or not
