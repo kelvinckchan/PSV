@@ -1,12 +1,16 @@
 package app.view;
 
 import java.io.File;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
+import TestCode.AsymmetricEncryption;
 import TestCode.FileUtil;
 import TestCode.SymmetricEncryption;
 import app.Main;
+import app.model.AsymmetricKey;
 import app.model.SymmetricKey;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -120,6 +124,26 @@ public class SymTabController {
 	// remarksLabel.setText("");
 	// }
 	// }
+	@FXML
+	private void handlExport() {
+		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
+		if (selectedKey != null) {
+			FileChooser fileChooser = new FileChooser();
+			File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+			FileUtil.exportByteArrayToFile(file.getAbsolutePath(), selectedKey.getSeckey().getEncoded());
+		}
+	}
+
+	@FXML
+	private void handlImport() {
+		FileChooser fileChooser = new FileChooser();
+		File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+
+		if (file != null) {
+
+		}
+
+	}
 
 	@FXML
 	private void handleEncrypt() {
