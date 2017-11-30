@@ -1,4 +1,4 @@
-package TestCode;
+package app.util;
 
 import static org.junit.Assert.assertEquals;
 

@@ -12,13 +12,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import TestCode.FileUtil;
 import app.model.AsymmetricKey;
 import app.model.AsymmetricKeyWrapper;
 import app.model.SymmetricKey;
 import app.model.SymmetricKeyWrapper;
 import app.model.UserInfo;
 import app.model.UserInfoWrapper;
+import app.util.FileUtil;
 import app.util.PBEncryption;
 import app.view.UserInfoEditDialogController;
 import app.view.SymKeyEditDialogController;
@@ -48,26 +48,19 @@ public class Main extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("The App");
 		initRootLayout();
-		// showView();
 		showLogin();
 	}
 
-	/**
-	 * Initializes the root layout.
-	 */
 	public void initRootLayout() {
 
 		try {
-			// Load root layout from fxml file.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/RootLayout.fxml"));
 			rootLayout = (BorderPane) loader.load();
 
-			// Show the scene containing the root layout.
 			Scene scene = new Scene(rootLayout);
 			scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			// Give the controller access to the main app.
 			RootLayoutController controller = loader.getController();
 			controller.setMainApp(this);
 			primaryStage.show();
@@ -91,21 +84,13 @@ public class Main extends Application {
 
 	}
 
-	/**
-	 * Shows the model overview inside the root layout.
-	 */
 	public void showView() {
 
 		try {
-			// Load model overview.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/Tabpanel.fxml"));
 			AnchorPane Tabpanel = (AnchorPane) loader.load();
-
-			// Set model overview into the center of root layout.
 			rootLayout.setCenter(Tabpanel);
-
-			// Give the controller access to the main app.
 			TabpanelController controller = loader.getController();
 			controller.setMainApp(this);
 
@@ -114,37 +99,22 @@ public class Main extends Application {
 		}
 	}
 
-	/**
-	 * Opens a dialog to edit details for the specified model. If the user clicks
-	 * OK, the changes are saved into the provided model object and true is
-	 * returned.
-	 * 
-	 * @param userInfo
-	 *            the model object to be edited
-	 * @return true if the user clicked OK, false otherwise.
-	 */
 	public boolean showModelEditDialog(UserInfo userInfo) {
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/UserInfoEditDialog.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
-
-			// Create the dialog Stage.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Edit UserInfo");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(primaryStage);
 			Scene scene = new Scene(page);
-			// scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
 			dialogStage.setScene(scene);
 
-			// Set the model into the controller.
 			UserInfoEditDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setModel(userInfo);
 
-			// Show the dialog and wait until the user closes it
 			dialogStage.showAndWait();
 
 			return controller.isOkClicked();
@@ -153,14 +123,13 @@ public class Main extends Application {
 			return false;
 		}
 	}
+
 	public boolean showAsymKeyEditDialog(AsymmetricKey selectedKey) {
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/AsymKeyEditDialog.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
 
-			// Create the dialog Stage.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Edit Sym Key");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -169,12 +138,10 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
 			dialogStage.setScene(scene);
 
-			// Set the model into the controller.
 			AsymKeyEditDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setModel(selectedKey);
 
-			// Show the dialog and wait until the user closes it
 			dialogStage.showAndWait();
 
 			return controller.isOkClicked();
@@ -183,14 +150,13 @@ public class Main extends Application {
 			return false;
 		}
 	}
+
 	public boolean showSymKeyEditDialog(SymmetricKey selectedKey) {
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("view/SymKeyEditDialog.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
 
-			// Create the dialog Stage.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Edit Sym Key");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -199,12 +165,10 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("./style/application.css").toExternalForm());
 			dialogStage.setScene(scene);
 
-			// Set the model into the controller.
 			SymKeyEditDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setModel(selectedKey);
 
-			// Show the dialog and wait until the user closes it
 			dialogStage.showAndWait();
 
 			return controller.isOkClicked();
@@ -224,13 +188,6 @@ public class Main extends Application {
 		}
 	}
 
-	/**
-	 * Sets the file path of the currently loaded file. The path is persisted in the
-	 * OS specific registry.
-	 * 
-	 * @param file
-	 *            the file or null to remove the path
-	 */
 	public void setPBEFilePath(File file) {
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		if (file != null) {
@@ -242,12 +199,6 @@ public class Main extends Application {
 		}
 	}
 
-	/**
-	 * Loads model data from the specified file. The current model data will be
-	 * replaced.
-	 * 
-	 * @param file
-	 */
 	public void loadUserInfoFromFile(File file) {
 		try {
 
@@ -279,17 +230,13 @@ public class Main extends Application {
 			JAXBContext context = JAXBContext.newInstance(SymmetricKeyWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
 
-			// Reading XML from the file and unmarshalling.
 			SymmetricKeyWrapper wrapper = (SymmetricKeyWrapper) um
 					.unmarshal(new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file)));
 
 			symmetricKeyData.clear();
 			symmetricKeyData.addAll(wrapper.getSymmetricKeys());
 
-			// Save the file path to the registry.
-//			setModelFilePath(file);
-
-		} catch (Exception e) { // catches ANY exception
+		} catch (Exception e) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Could not load data");
@@ -298,23 +245,20 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
+
 	public void loadAsymKeyFromFile(File file) {
 		try {
 
 			JAXBContext context = JAXBContext.newInstance(AsymmetricKeyWrapper.class);
 			Unmarshaller um = context.createUnmarshaller();
 
-			// Reading XML from the file and unmarshalling.
 			AsymmetricKeyWrapper wrapper = (AsymmetricKeyWrapper) um
 					.unmarshal(new ByteArrayInputStream(PBEncryption.decryptPBKDF2WithHmacSHA256(file)));
 
 			asymmetricKeyData.clear();
 			asymmetricKeyData.addAll(wrapper.getAsymmetricKeys());
 
-			// Save the file path to the registry.
-//			setModelFilePath(file);
-
-		} catch (Exception e) { // catches ANY exception
+		} catch (Exception e) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Could not load data");
@@ -337,8 +281,7 @@ public class Main extends Application {
 			FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
 					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
 
-//			setModelFilePath(file);
-		} catch (Exception e) { // catches ANY exception
+		} catch (Exception e) {
 			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -347,6 +290,7 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
+
 	public void saveAsymKeyToFile(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(AsymmetricKeyWrapper.class);
@@ -360,8 +304,7 @@ public class Main extends Application {
 			FileUtil.exportByteArrayToFile(file.getAbsolutePath(),
 					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
 
-//			setModelFilePath(file);
-		} catch (Exception e) { // catches ANY exception
+		} catch (Exception e) { 
 			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -370,6 +313,7 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
+
 	public void saveUserInfoToFile(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(UserInfoWrapper.class);
@@ -384,7 +328,7 @@ public class Main extends Application {
 					PBEncryption.encryptPBKDF2WithHmacSHA256(out.toByteArray()));
 
 			setModelFilePath(file);
-		} catch (Exception e) { // catches ANY exception
+		} catch (Exception e) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Could not save data");
@@ -393,9 +337,6 @@ public class Main extends Application {
 		}
 	}
 
-	/**
-	 * The data as an observable list of Persons.
-	 */
 	private ObservableList<UserInfo> userInfoData = FXCollections.observableArrayList();
 	private ObservableList<SymmetricKey> symmetricKeyData = FXCollections.observableArrayList();
 	private ObservableList<AsymmetricKey> asymmetricKeyData = FXCollections.observableArrayList();
@@ -412,11 +353,6 @@ public class Main extends Application {
 		return asymmetricKeyData;
 	}
 
-	/**
-	 * Returns the main stage.
-	 * 
-	 * @return
-	 */
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
@@ -426,11 +362,7 @@ public class Main extends Application {
 		launch(args);
 	}
 
-	/**
-	 * Constructor
-	 */
 	public Main() {
-		// modelData.add(new Model("AccountName", "UserID"));
 	}
 
 	public void setModelFilePath(File file) {
@@ -453,7 +385,5 @@ public class Main extends Application {
 			return null;
 		}
 	}
-
-
 
 }

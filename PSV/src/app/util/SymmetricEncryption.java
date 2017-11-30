@@ -1,4 +1,4 @@
-package TestCode;
+package app.util;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

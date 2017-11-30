@@ -1,18 +1,12 @@
 package app.view;
 
 import app.model.UserInfo;
-import app.util.DateUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-/**
- * Dialog to edit details of a Model.
- * 
- * @author Marco Jakob
- */
 public class UserInfoEditDialogController {
 
 	@FXML
@@ -29,28 +23,14 @@ public class UserInfoEditDialogController {
 	private UserInfo Model;
 	private boolean okClicked = false;
 
-	/**
-	 * Initializes the controller class. This method is automatically called after
-	 * the fxml file has been loaded.
-	 */
 	@FXML
 	private void initialize() {
 	}
 
-	/**
-	 * Sets the stage of this dialog.
-	 * 
-	 * @param dialogStage
-	 */
 	public void setDialogStage(Stage dialogStage) {
 		this.dialogStage = dialogStage;
 	}
 
-	/**
-	 * Sets the Model to be edited in the dialog.
-	 * 
-	 * @param Model
-	 */
 	public void setModel(UserInfo Model) {
 		this.Model = Model;
 		accountNameField.setText(Model.getAccountName());

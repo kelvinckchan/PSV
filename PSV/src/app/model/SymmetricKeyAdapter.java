@@ -11,7 +11,7 @@ import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import TestCode.EncryptionUtil;
+import app.util.EncryptionUtil;
 
 public class SymmetricKeyAdapter extends XmlAdapter<byte[], SecretKey> {
 

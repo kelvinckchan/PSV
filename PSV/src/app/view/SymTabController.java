@@ -1,17 +1,13 @@
 package app.view;
 
 import java.io.File;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
-import TestCode.AsymmetricEncryption;
-import TestCode.FileUtil;
-import TestCode.SymmetricEncryption;
 import app.Main;
-import app.model.AsymmetricKey;
 import app.model.SymmetricKey;
+import app.util.FileUtil;
+import app.util.SymmetricEncryption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -47,28 +43,11 @@ public class SymTabController {
 	private ComboBox<String> keyLengthCbx;
 	@FXML
 	private ComboBox<String> methodCbx;
-	// @FXML
-	// private Label accountNameLabel;
-	// @FXML
-	// private Label userIDLabel;
-	// @FXML
-	// private Label passwordLabel;
-	// @FXML
-	// private Label remarksLabel;
-	//
-	// // Reference to the main application.
 	private Main mainApp;
 
-	/**
-	 * The constructor. The constructor is called before the initialize() method.
-	 */
 	public SymTabController() {
 	}
 
-	/**
-	 * Initializes the controller class. This method is automatically called after
-	 * the fxml file has been loaded.
-	 */
 	@FXML
 	private void initialize() {
 		// Initialize the SymmetricKey table with the two columns.
@@ -88,23 +67,11 @@ public class SymTabController {
 			}
 		});
 
-		// Clear SymmetricKey details.
-		// showModelDetails(null);
-
-		// Listen for selection changes and show the SymmetricKey details when changed.
-		// SymmetricKeyTable.getSelectionModel().selectedItemProperty()
-		// .addListener((observable, oldValue, newValue) -> showModelDetails(newValue));
 	}
 
-	/**
-	 * Is called by the main application to give a reference back to itself.
-	 * 
-	 * @param mainApp
-	 */
 	public void setMainApp(Main mainApp) {
 		this.mainApp = mainApp;
 
-		// Add observable list data to the table
 		SymmetricKeyTable.setItems(mainApp.getSymmetricKeyData());
 	}
 
@@ -140,6 +107,7 @@ public class SymTabController {
 		File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
 
 		if (file != null) {
+			FileUtil.importByteArrayFromFile(file);
 
 		}
 
@@ -188,9 +156,6 @@ public class SymTabController {
 		}
 	}
 
-	/**
-	 * Called when the user clicks on the delete button.
-	 */
 	@FXML
 	private void handleDeleteKey() {
 		int selectedIndex = SymmetricKeyTable.getSelectionModel().getSelectedIndex();
@@ -198,15 +163,10 @@ public class SymTabController {
 			SymmetricKeyTable.getItems().remove(selectedIndex);
 			SymmetricKeyTable.getSelectionModel().clearSelection();
 		} else {
-			// Nothing selected.
 			showNothingSelectedAlertDialog();
 		}
 	}
 
-	/**
-	 * Called when the user clicks the new button. Opens a dialog to edit details
-	 * for a new SymmetricKey.
-	 */
 	@FXML
 	private void handleNewKey() {
 
@@ -239,10 +199,6 @@ public class SymTabController {
 
 	}
 
-	/**
-	 * Called when the user clicks the edit button. Opens a dialog to edit details
-	 * for the selected SymmetricKey.
-	 */
 	@FXML
 	private void handleEditKey() {
 		SymmetricKey selectedKey = SymmetricKeyTable.getSelectionModel().getSelectedItem();
@@ -253,13 +209,11 @@ public class SymTabController {
 			}
 
 		} else {
-			// Nothing selected.
 			showNothingSelectedAlertDialog();
 		}
 	}
 
 	private void showSuccessDialog() {
-		// Nothing selected.
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.initOwner(mainApp.getPrimaryStage());
 		alert.setTitle("Done. ");

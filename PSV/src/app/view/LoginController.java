@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import TestCode.EncryptionUtil;
-import TestCode.FileUtil;
 import app.Main;
 import app.model.UserInfo;
+import app.util.EncryptionUtil;
+import app.util.FileUtil;
 import app.util.PBEncryption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,11 +34,6 @@ public class LoginController {
 	private void initialize() {
 	}
 
-	/**
-	 * Is called by the main application to give a reference back to itself.
-	 * 
-	 * @param mainApp
-	 */
 	public void setMainApp(Main mainApp) {
 		this.mainApp = mainApp;
 	}

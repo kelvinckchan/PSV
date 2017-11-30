@@ -5,11 +5,11 @@ import java.io.File;
 import javax.crypto.SecretKey;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
-import TestCode.CheckSum;
-import TestCode.FileUtil;
-import TestCode.SymmetricEncryption;
 import app.Main;
 import app.model.SymmetricKey;
+import app.util.CheckSum;
+import app.util.FileUtil;
+import app.util.SymmetricEncryption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -61,7 +61,6 @@ public class CheckSumTabController {
 
 
 	private void showNothingSelectedAlertDialog() {
-		// Nothing selected.
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.initOwner(mainApp.getPrimaryStage());
 		alert.setTitle("No Selection");

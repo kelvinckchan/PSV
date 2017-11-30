@@ -10,11 +10,11 @@ import java.security.SignatureException;
 
 import javax.crypto.SecretKey;
 
-import TestCode.AsymmetricEncryption;
-import TestCode.FileUtil;
-import TestCode.SymmetricEncryption;
 import app.Main;
 import app.model.AsymmetricKey;
+import app.util.AsymmetricEncryption;
+import app.util.FileUtil;
+import app.util.SymmetricEncryption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -55,28 +55,11 @@ public class AsymTabController {
 	@FXML
 	private Button signBtn;
 
-	// @FXML
-	// private Label accountNameLabel;
-	// @FXML
-	// private Label userIDLabel;
-	// @FXML
-	// private Label passwordLabel;
-	// @FXML
-	// private Label remarksLabel;
-	//
-	// // Reference to the main application.
 	private Main mainApp;
 
-	/**
-	 * The constructor. The constructor is called before the initialize() method.
-	 */
 	public AsymTabController() {
 	}
 
-	/**
-	 * Initializes the controller class. This method is automatically called after
-	 * the fxml file has been loaded.
-	 */
 	@FXML
 	private void initialize() {
 		// Initialize the AsymmetricKey table with the two columns.
@@ -111,15 +94,8 @@ public class AsymTabController {
 		});
 	}
 
-	/**
-	 * Is called by the main application to give a reference back to itself.
-	 * 
-	 * @param mainApp
-	 */
 	public void setMainApp(Main mainApp) {
 		this.mainApp = mainApp;
-
-		// Add observable list data to the table
 		asymmetricKeyTable.setItems(mainApp.getAsymmetricKeyData());
 	}
 
@@ -266,9 +242,6 @@ public class AsymTabController {
 		}
 	}
 
-	/**
-	 * Called when the user clicks on the delete button.
-	 */
 	@FXML
 	private void handleDeleteKey() {
 		int selectedIndex = asymmetricKeyTable.getSelectionModel().getSelectedIndex();
@@ -276,15 +249,10 @@ public class AsymTabController {
 			asymmetricKeyTable.getItems().remove(selectedIndex);
 			asymmetricKeyTable.getSelectionModel().clearSelection();
 		} else {
-			// Nothing selected.
 			showNothingSelectedAlertDialog();
 		}
 	}
 
-	/**
-	 * Called when the user clicks the new button. Opens a dialog to edit details
-	 * for a new AsymmetricKey.
-	 */
 	@FXML
 	private void handleNewKey() {
 
@@ -317,11 +285,6 @@ public class AsymTabController {
 		}
 
 	}
-
-	/**
-	 * Called when the user clicks the edit button. Opens a dialog to edit details
-	 * for the selected AsymmetricKey.
-	 */
 	@FXML
 	private void handleEditKey() {
 		AsymmetricKey selectedKey = asymmetricKeyTable.getSelectionModel().getSelectedItem();
@@ -332,13 +295,11 @@ public class AsymTabController {
 			}
 
 		} else {
-			// Nothing selected.
 			showNothingSelectedAlertDialog();
 		}
 	}
 
 	private void showSuccessDialog() {
-		// Nothing selected.
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.initOwner(mainApp.getPrimaryStage());
 		alert.setTitle("Done. ");
@@ -349,7 +310,6 @@ public class AsymTabController {
 	}
 
 	private void showNothingSelectedAlertDialog() {
-		// Nothing selected.
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.initOwner(mainApp.getPrimaryStage());
 		alert.setTitle("No Selection");
